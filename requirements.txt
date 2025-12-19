@@ -1,0 +1,13 @@
+numpy
+pandas
+openpyxl
+sentence-transformers
+torch
+langchain-text-splitters
+boto3
+chromadb
+psycopg2-binary
+python-dotenv
+typer[all]
+rich
+
