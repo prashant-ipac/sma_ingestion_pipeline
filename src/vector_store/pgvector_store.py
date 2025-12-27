@@ -121,4 +121,96 @@ class PgVectorStore(VectorStore):
         cur.close()
         conn.close()
 
+    def query_by_timestamp(
+        self,
+        year: int | None = None,
+        month: int | None = None,
+        day: int | None = None,
+        start_epoch: int | None = None,
+        end_epoch: int | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """
+        Query embeddings filtered by timestamp.
+
+        Args:
+            year: Filter by year
+            month: Filter by month (1-12)
+            day: Filter by day (1-31)
+            start_epoch: Filter by start epoch timestamp (inclusive)
+            end_epoch: Filter by end epoch timestamp (inclusive)
+            limit: Maximum number of results to return
+
+        Returns:
+            Dictionary with keys: 'ids', 'embeddings', 'texts', 'metadatas'
+        """
+        import json
+
+        # Build SQL WHERE clause
+        conditions = []
+        params = []
+
+        if year is not None:
+            conditions.append("payload->'timestamp'->>'year' = %s")
+            params.append(str(year))
+
+        if month is not None:
+            conditions.append("payload->'timestamp'->>'month' = %s")
+            params.append(str(month))
+
+        if day is not None:
+            conditions.append("payload->'timestamp'->>'day' = %s")
+            params.append(str(day))
+
+        if start_epoch is not None:
+            conditions.append("(payload->'timestamp'->>'epoch')::bigint >= %s")
+            params.append(start_epoch)
+
+        if end_epoch is not None:
+            conditions.append("(payload->'timestamp'->>'epoch')::bigint <= %s")
+            params.append(end_epoch)
+
+        where_clause = " AND ".join(conditions) if conditions else "1=1"
+        
+        query = f"""
+            SELECT id, text, payload, embedding
+            FROM {self.table_name}
+            WHERE {where_clause}
+            ORDER BY id
+        """
+        
+        if limit:
+            query += f" LIMIT {limit}"
+
+        logger.info(
+            "Querying pgvector table '%s' with timestamp filter: %s",
+            self.table_name,
+            conditions,
+        )
+
+        conn = psycopg2.connect(self.dsn)
+        cur = conn.cursor()
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        # Convert results to dict format
+        ids = [str(row[0]) for row in rows]
+        texts = [row[1] for row in rows]
+        payloads = [row[2] for row in rows]
+        embeddings_list = [row[3] for row in rows]
+
+        embeddings_array = np.array(embeddings_list, dtype=np.float32) if embeddings_list else np.array([])
+
+        result = {
+            "embeddings": embeddings_array,
+            "ids": ids,
+            "texts": texts,
+            "metadatas": [{"payload": payload} for payload in payloads],
+        }
+
+        logger.info("Retrieved %d embeddings matching timestamp filter", len(ids))
+        return result
+
 

@@ -28,6 +28,7 @@ from rich.table import Table
 from src.config import Config
 from src.embedding import EmbeddingModel
 from src.vector_store.chroma_vector_store import ChromaVectorStore
+from src.vector_store.pgvector_store import PgVectorStore
 
 # Conditional import for pgvector
 try:
@@ -290,6 +291,166 @@ def inspect(
         raise typer.BadParameter("Inspect supported only for chromadb or pgvector.")
     
     console.print("\n[bold green]✓ Schema inspection complete[/bold green]")
+
+
+@app.command("query-by-timestamp")
+def query_by_timestamp(
+    backend: str = typer.Option("chromadb", "--backend", "-b", help="chromadb|pgvector"),
+    year: int | None = typer.Option(None, "--year", "-y", help="Filter by year (e.g., 2025)"),
+    month: int | None = typer.Option(None, "--month", "-m", help="Filter by month (1-12)"),
+    day: int | None = typer.Option(None, "--day", "-d", help="Filter by day (1-31)"),
+    start_epoch: int | None = typer.Option(None, "--start-epoch", help="Filter by start epoch timestamp"),
+    end_epoch: int | None = typer.Option(None, "--end-epoch", help="Filter by end epoch timestamp"),
+    start_date: str | None = typer.Option(None, "--start-date", help="Start date (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)"),
+    end_date: str | None = typer.Option(None, "--end-date", help="End date (YYYY-MM-DD or YYYY-MM-DD HH:MM:SS)"),
+    limit: int | None = typer.Option(10, "--limit", "-l", help="Maximum number of results"),
+) -> None:
+    """
+    Query vectors filtered by timestamp.
+    
+    Examples:
+      # Query by year
+      python scripts/vector_store_debug.py query-by-timestamp --year 2025
+      
+      # Query by year and month
+      python scripts/vector_store_debug.py query-by-timestamp --year 2025 --month 12
+      
+      # Query by date range
+      python scripts/vector_store_debug.py query-by-timestamp --start-date "2025-01-01" --end-date "2025-01-31"
+    """
+    from datetime import datetime
+
+    cfg = Config()
+    cfg.backend = backend
+    cfg.validate()
+
+    # Convert date strings to epoch if provided
+    if start_date:
+        try:
+            if len(start_date) == 10:  # YYYY-MM-DD
+                dt = datetime.strptime(start_date, "%Y-%m-%d")
+            else:  # YYYY-MM-DD HH:MM:SS
+                dt = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
+            start_epoch = int(dt.timestamp())
+        except ValueError as e:
+            console.print(f"[red]Invalid start date format: {e}[/red]")
+            raise typer.Exit(1)
+
+    if end_date:
+        try:
+            if len(end_date) == 10:  # YYYY-MM-DD
+                dt = datetime.strptime(end_date, "%Y-%m-%d")
+                # Set to end of day
+                dt = dt.replace(hour=23, minute=59, second=59)
+            else:  # YYYY-MM-DD HH:MM:SS
+                dt = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+            end_epoch = int(dt.timestamp())
+        except ValueError as e:
+            console.print(f"[red]Invalid end date format: {e}[/red]")
+            raise typer.Exit(1)
+
+    if backend == "chromadb":
+        store = ChromaVectorStore(path=cfg.chromadb_path)
+        results = store.query_by_timestamp(
+            year=year,
+            month=month,
+            day=day,
+            start_epoch=start_epoch,
+            end_epoch=end_epoch,
+            limit=limit,
+        )
+    elif backend == "pgvector":
+        if psycopg2 is None:
+            raise typer.BadParameter("psycopg2 is required for pgvector backend. Install it with: pip install psycopg2-binary")
+        from src.vector_store.pgvector_store import PgVectorStore
+        store = PgVectorStore(
+            dsn=cfg.pgvector_dsn,
+            table_name=cfg.pgvector_table_name,
+            embedding_dim=cfg.embedding_dim,
+        )
+        results = store.query_by_timestamp(
+            year=year,
+            month=month,
+            day=day,
+            start_epoch=start_epoch,
+            end_epoch=end_epoch,
+            limit=limit,
+        )
+    else:
+        raise typer.BadParameter("Timestamp query supported only for chromadb or pgvector.")
+
+    ids = results.get("ids", [])
+    texts = results.get("texts", [])
+    metadatas = results.get("metadatas", [])
+
+    console.print(f"\n[bold green]Found {len(ids)} results matching timestamp filter[/bold green]")
+
+    if not ids:
+        console.print("[yellow]No results found.[/yellow]")
+        return
+
+    # Build filter description
+    filter_parts = []
+    if year:
+        filter_parts.append(f"year={year}")
+    if month:
+        filter_parts.append(f"month={month}")
+    if day:
+        filter_parts.append(f"day={day}")
+    if start_epoch:
+        filter_parts.append(f"start_epoch={start_epoch}")
+    if end_epoch:
+        filter_parts.append(f"end_epoch={end_epoch}")
+
+    table = Table(title=f"Timestamp Query Results ({', '.join(filter_parts) if filter_parts else 'all'})")
+    table.add_column("#", justify="right")
+    table.add_column("ID", style="cyan")
+    table.add_column("Timestamp", style="yellow")
+    table.add_column("Platform", style="green")
+    table.add_column("Author", style="magenta")
+    table.add_column("Text", overflow="fold", max_width=50)
+
+    for idx, (entry_id, text, meta) in enumerate(zip(ids, texts, metadatas), start=1):
+        # Extract payload
+        if isinstance(meta, dict):
+            payload_raw = meta.get("payload", meta)
+            if isinstance(payload_raw, str):
+                try:
+                    payload = json.loads(payload_raw)
+                except (json.JSONDecodeError, TypeError):
+                    payload = payload_raw
+            else:
+                payload = payload_raw
+        else:
+            payload = meta or {}
+
+        # Extract timestamp info
+        timestamp_str = "N/A"
+        if isinstance(payload, dict) and "timestamp" in payload:
+            ts = payload["timestamp"]
+            if isinstance(ts, dict):
+                if "created_at" in ts:
+                    timestamp_str = ts["created_at"][:19]  # Truncate to YYYY-MM-DD HH:MM:SS
+                elif "epoch" in ts:
+                    try:
+                        dt = datetime.fromtimestamp(int(ts["epoch"]))
+                        timestamp_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+                    except (ValueError, TypeError):
+                        timestamp_str = str(ts.get("epoch", "N/A"))
+
+        platform = payload.get("platform", "N/A") if isinstance(payload, dict) else "N/A"
+        author = payload.get("author_name", payload.get("author_id", "N/A")) if isinstance(payload, dict) else "N/A"
+
+        table.add_row(
+            str(idx),
+            entry_id[:8] + "..." if len(entry_id) > 8 else entry_id,
+            timestamp_str,
+            str(platform),
+            str(author),
+            text[:50] + "..." if len(text) > 50 else text,
+        )
+
+    console.print(table)
 
 
 if __name__ == "__main__":

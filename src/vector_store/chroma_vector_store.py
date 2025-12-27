@@ -96,10 +96,22 @@ class ChromaVectorStore(VectorStore):
             ]
             batch_texts = list(texts[batch_start:batch_end])
             # Store the full payload as JSON string in metadata (ChromaDB only supports flat primitives)
-            batch_metadatas = [
-                {"payload": json.dumps(payload, ensure_ascii=False)} 
-                for payload in payloads[batch_start:batch_end]
-            ]
+            # Also extract timestamp fields for filtering
+            batch_metadatas = []
+            for payload in payloads[batch_start:batch_end]:
+                meta = {"payload": json.dumps(payload, ensure_ascii=False)}
+                # Extract timestamp fields for filtering
+                if "timestamp" in payload and isinstance(payload["timestamp"], dict):
+                    ts = payload["timestamp"]
+                    if "epoch" in ts:
+                        meta["timestamp_epoch"] = int(ts["epoch"])
+                    if "year" in ts:
+                        meta["timestamp_year"] = int(ts["year"])
+                    if "month" in ts:
+                        meta["timestamp_month"] = int(ts["month"])
+                    if "day" in ts:
+                        meta["timestamp_day"] = int(ts["day"])
+                batch_metadatas.append(meta)
 
             self.collection.add(
                 ids=batch_ids,
@@ -179,6 +191,95 @@ class ChromaVectorStore(VectorStore):
             result["metadatas"] = metadatas_parsed
 
         logger.info("Retrieved %d embeddings successfully", len(embeddings_array))
+        return result
+
+    def query_by_timestamp(
+        self,
+        year: int | None = None,
+        month: int | None = None,
+        day: int | None = None,
+        start_epoch: int | None = None,
+        end_epoch: int | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """
+        Query embeddings filtered by timestamp.
+
+        Args:
+            year: Filter by year
+            month: Filter by month (1-12)
+            day: Filter by day (1-31)
+            start_epoch: Filter by start epoch timestamp (inclusive)
+            end_epoch: Filter by end epoch timestamp (inclusive)
+            limit: Maximum number of results to return
+
+        Returns:
+            Dictionary with keys: 'ids', 'embeddings', 'texts', 'metadatas'
+        """
+        # Build metadata filter for ChromaDB
+        where_clause = {}
+        
+        if year is not None:
+            where_clause["timestamp_year"] = year
+        if month is not None:
+            where_clause["timestamp_month"] = month
+        if day is not None:
+            where_clause["timestamp_day"] = day
+        
+        # For epoch range, we need to use ChromaDB's $gte and $lte operators
+        if start_epoch is not None or end_epoch is not None:
+            epoch_filter = {}
+            if start_epoch is not None:
+                epoch_filter["$gte"] = start_epoch
+            if end_epoch is not None:
+                epoch_filter["$lte"] = end_epoch
+            if epoch_filter:
+                where_clause["timestamp_epoch"] = epoch_filter
+
+        logger.info(
+            "Querying ChromaDB collection '%s' with timestamp filter: %s",
+            self.collection_name,
+            where_clause,
+        )
+
+        # Query ChromaDB
+        if where_clause:
+            results = self.collection.get(
+                where=where_clause if where_clause else None,
+                limit=limit,
+                include=["embeddings", "documents", "metadatas"],
+            )
+        else:
+            # No filter, get all
+            results = self.collection.get(
+                limit=limit,
+                include=["embeddings", "documents", "metadatas"],
+            )
+
+        # Convert embeddings to numpy array
+        embeddings_list = results.get("embeddings", [])
+        embeddings_array = np.array(embeddings_list, dtype=np.float32) if embeddings_list else np.array([])
+
+        result = {
+            "embeddings": embeddings_array,
+            "ids": results.get("ids", []),
+            "texts": results.get("documents", []),
+            "metadatas": [],
+        }
+
+        # Deserialize JSON payload strings
+        metadatas_raw = results.get("metadatas", [])
+        for meta in metadatas_raw:
+            if meta and "payload" in meta:
+                try:
+                    payload_dict = json.loads(meta["payload"])
+                    result["metadatas"].append({"payload": payload_dict})
+                except (json.JSONDecodeError, TypeError):
+                    result["metadatas"].append(meta)
+            else:
+                result["metadatas"].append(meta)
+
+        logger.info("Retrieved %d embeddings matching timestamp filter", len(result["ids"]))
         return result
 
 
