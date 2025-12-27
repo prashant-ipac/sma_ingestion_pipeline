@@ -217,14 +217,15 @@ class ChromaVectorStore(VectorStore):
             Dictionary with keys: 'ids', 'embeddings', 'texts', 'metadatas'
         """
         # Build metadata filter for ChromaDB
-        where_clause = {}
+        # ChromaDB uses $and for combining conditions and $gte/$lte for ranges
+        conditions = []
         
         if year is not None:
-            where_clause["timestamp_year"] = year
+            conditions.append({"timestamp_year": year})
         if month is not None:
-            where_clause["timestamp_month"] = month
+            conditions.append({"timestamp_month": month})
         if day is not None:
-            where_clause["timestamp_day"] = day
+            conditions.append({"timestamp_day": day})
         
         # For epoch range, we need to use ChromaDB's $gte and $lte operators
         if start_epoch is not None or end_epoch is not None:
@@ -234,7 +235,15 @@ class ChromaVectorStore(VectorStore):
             if end_epoch is not None:
                 epoch_filter["$lte"] = end_epoch
             if epoch_filter:
-                where_clause["timestamp_epoch"] = epoch_filter
+                conditions.append({"timestamp_epoch": epoch_filter})
+
+        # Build where clause - use $and if multiple conditions, otherwise use single condition
+        if len(conditions) > 1:
+            where_clause = {"$and": conditions}
+        elif len(conditions) == 1:
+            where_clause = conditions[0]
+        else:
+            where_clause = None
 
         logger.info(
             "Querying ChromaDB collection '%s' with timestamp filter: %s",
@@ -244,11 +253,74 @@ class ChromaVectorStore(VectorStore):
 
         # Query ChromaDB
         if where_clause:
-            results = self.collection.get(
-                where=where_clause if where_clause else None,
-                limit=limit,
-                include=["embeddings", "documents", "metadatas"],
-            )
+            try:
+                results = self.collection.get(
+                    where=where_clause,
+                    limit=limit,
+                    include=["embeddings", "documents", "metadatas"],
+                )
+            except Exception as e:
+                # If metadata fields don't exist (old data), fall back to getting all and filtering in Python
+                logger.warning(
+                    "ChromaDB metadata filter failed (possibly old data format): %s. "
+                    "Falling back to Python-side filtering.",
+                    e,
+                )
+                results = self.collection.get(
+                    limit=None,  # Get all to filter in Python
+                    include=["embeddings", "documents", "metadatas"],
+                )
+                # Filter in Python
+                filtered_ids = []
+                filtered_embeddings = []
+                filtered_texts = []
+                filtered_metas = []
+                
+                for idx, meta in enumerate(results.get("metadatas", [])):
+                    # Parse payload to check timestamp
+                    payload_str = meta.get("payload", "") if meta else ""
+                    if not payload_str:
+                        continue
+                    
+                    try:
+                        payload = json.loads(payload_str) if isinstance(payload_str, str) else payload_str
+                        timestamp = payload.get("timestamp", {})
+                        
+                        # Check filters
+                        match = True
+                        if year is not None and timestamp.get("year") != year:
+                            match = False
+                        if match and month is not None and timestamp.get("month") != month:
+                            match = False
+                        if match and day is not None and timestamp.get("day") != day:
+                            match = False
+                        if match and start_epoch is not None:
+                            epoch = timestamp.get("epoch")
+                            if epoch is None or int(epoch) < start_epoch:
+                                match = False
+                        if match and end_epoch is not None:
+                            epoch = timestamp.get("epoch")
+                            if epoch is None or int(epoch) > end_epoch:
+                                match = False
+                        
+                        if match:
+                            filtered_ids.append(results.get("ids", [])[idx])
+                            if results.get("embeddings"):
+                                filtered_embeddings.append(results.get("embeddings", [])[idx])
+                            filtered_texts.append(results.get("documents", [])[idx])
+                            filtered_metas.append(meta)
+                            if limit and len(filtered_ids) >= limit:
+                                break
+                    except (json.JSONDecodeError, TypeError, KeyError, IndexError):
+                        continue
+                
+                # Reconstruct results dict
+                results = {
+                    "ids": filtered_ids,
+                    "embeddings": filtered_embeddings,
+                    "documents": filtered_texts,
+                    "metadatas": filtered_metas,
+                }
         else:
             # No filter, get all
             results = self.collection.get(
