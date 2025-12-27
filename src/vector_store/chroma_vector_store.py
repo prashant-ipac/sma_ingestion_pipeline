@@ -4,6 +4,7 @@ ChromaDB vector store implementation.
 
 from __future__ import annotations
 
+import json
 import uuid
 from typing import Iterable, List, Mapping, Sequence
 
@@ -94,9 +95,10 @@ class ChromaVectorStore(VectorStore):
                 np.asarray(e).tolist() for e in embeddings[batch_start:batch_end]
             ]
             batch_texts = list(texts[batch_start:batch_end])
-            # Store the full payload in metadata
+            # Store the full payload as JSON string in metadata (ChromaDB only supports flat primitives)
             batch_metadatas = [
-                {"payload": payload} for payload in payloads[batch_start:batch_end]
+                {"payload": json.dumps(payload, ensure_ascii=False)} 
+                for payload in payloads[batch_start:batch_end]
             ]
 
             self.collection.add(
@@ -160,7 +162,21 @@ class ChromaVectorStore(VectorStore):
             result["texts"] = results.get("documents", [])
 
         if include_metadatas:
-            result["metadatas"] = results.get("metadatas", [])
+            # Deserialize JSON payload strings back to dictionaries
+            metadatas_raw = results.get("metadatas", [])
+            metadatas_parsed = []
+            for meta in metadatas_raw:
+                if meta and "payload" in meta:
+                    try:
+                        # Parse the JSON string back to dict
+                        payload_dict = json.loads(meta["payload"])
+                        metadatas_parsed.append({"payload": payload_dict})
+                    except (json.JSONDecodeError, TypeError):
+                        # If parsing fails, return as-is
+                        metadatas_parsed.append(meta)
+                else:
+                    metadatas_parsed.append(meta)
+            result["metadatas"] = metadatas_parsed
 
         logger.info("Retrieved %d embeddings successfully", len(embeddings_array))
         return result
