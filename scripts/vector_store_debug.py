@@ -11,10 +11,16 @@ Examples:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 import json
 from typing import List
 
-import psycopg2
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -22,6 +28,12 @@ from rich.table import Table
 from src.config import Config
 from src.embedding import EmbeddingModel
 from src.vector_store.chroma_vector_store import ChromaVectorStore
+
+# Conditional import for pgvector
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
 
 
 app = typer.Typer(help="Debug utilities for vector stores.")
@@ -61,6 +73,8 @@ def semantic_search(
         metas = results.get("metadatas", [[]])[0]
         dists = results.get("distances", [[]])[0]
     elif backend == "pgvector":
+        if psycopg2 is None:
+            raise typer.BadParameter("psycopg2 is required for pgvector backend. Install it with: pip install psycopg2-binary")
         vec_literal = "[" + ", ".join(f"{v:.8f}" for v in embedding) + "]"
         conn = psycopg2.connect(cfg.pgvector_dsn)
         cur = conn.cursor()
@@ -194,6 +208,8 @@ def inspect(
                 else:
                     console.print(f"  [yellow]Metadata:[/yellow] (empty)")
     elif backend == "pgvector":
+        if psycopg2 is None:
+            raise typer.BadParameter("psycopg2 is required for pgvector backend. Install it with: pip install psycopg2-binary")
         conn = psycopg2.connect(cfg.pgvector_dsn)
         cur = conn.cursor()
 
