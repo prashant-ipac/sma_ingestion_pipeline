@@ -26,11 +26,23 @@ from rich.console import Console
 from rich.table import Table
 
 from src.config import Config
-from src.embedding import EmbeddingModel
-from src.vector_store.chroma_vector_store import ChromaVectorStore
-from src.vector_store.pgvector_store import PgVectorStore
 
-# Conditional import for pgvector
+# Conditional imports - only import what's needed
+try:
+    from src.embedding import EmbeddingModel
+except ImportError:
+    EmbeddingModel = None
+
+try:
+    from src.vector_store.chroma_vector_store import ChromaVectorStore
+except ImportError:
+    ChromaVectorStore = None
+
+try:
+    from src.vector_store.pgvector_store import PgVectorStore
+except ImportError:
+    PgVectorStore = None
+
 try:
     import psycopg2
 except ImportError:
@@ -350,6 +362,11 @@ def query_by_timestamp(
             raise typer.Exit(1)
 
     if backend == "chromadb":
+        # Import directly to avoid __init__.py chain that imports S3VectorStore
+        try:
+            from src.vector_store.chroma_vector_store import ChromaVectorStore
+        except ImportError as e:
+            raise typer.BadParameter(f"Failed to import ChromaVectorStore: {e}. Install dependencies with: pip install chromadb")
         store = ChromaVectorStore(path=cfg.chromadb_path)
         results = store.query_by_timestamp(
             year=year,
@@ -362,7 +379,11 @@ def query_by_timestamp(
     elif backend == "pgvector":
         if psycopg2 is None:
             raise typer.BadParameter("psycopg2 is required for pgvector backend. Install it with: pip install psycopg2-binary")
-        from src.vector_store.pgvector_store import PgVectorStore
+        # Import directly to avoid __init__.py chain
+        try:
+            from src.vector_store.pgvector_store import PgVectorStore
+        except ImportError as e:
+            raise typer.BadParameter(f"Failed to import PgVectorStore: {e}")
         store = PgVectorStore(
             dsn=cfg.pgvector_dsn,
             table_name=cfg.pgvector_table_name,
