@@ -12,7 +12,7 @@ from rich.progress import track
 
 from .config import Config
 from .logging_utils import configure_logging, get_logger
-from .data_loader import load_texts_from_excel
+from .data_loader import load_texts_from_excel, load_structured_data_from_excel
 from .chunking import chunk_texts
 from .embedding import EmbeddingModel
 from .vector_store import S3VectorStore, ChromaVectorStore, PgVectorStore
@@ -55,12 +55,35 @@ def ingest(
     console.print(f"[bold]Chunking:[/bold] {cfg.chunking_strategy}")
     console.print(f"[bold]Model:[/bold] {cfg.embedding_model}")
 
-    # Load data
-    texts = load_texts_from_excel(
-        excel_path=excel_path,
-        sheet_name=sheet_name or cfg.default_sheet_name,
-        text_columns=cfg.text_columns,
-    )
+    # Load structured data with payloads
+    try:
+        texts, payloads = load_structured_data_from_excel(
+            excel_path=excel_path,
+            sheet_name=sheet_name or cfg.default_sheet_name,
+            text_columns=cfg.text_columns,
+            embedding_model=cfg.embedding_model,
+        )
+        console.print(f"[bold green]Loaded {len(texts)} structured entries from Excel[/bold green]")
+    except Exception as e:
+        logger.warning(f"Failed to load structured data, falling back to simple text loading: {e}")
+        # Fallback to simple text loading
+        texts = load_texts_from_excel(
+            excel_path=excel_path,
+            sheet_name=sheet_name or cfg.default_sheet_name,
+            text_columns=cfg.text_columns,
+        )
+        from .data_formatter import create_payload
+        from pathlib import Path
+        payloads = [
+            create_payload(
+                text=text,
+                ingested_from="excel",
+                file_name=Path(excel_path).name,
+                row_number=i + 1,
+                embedding_model=cfg.embedding_model,
+            )
+            for i, text in enumerate(texts)
+        ]
 
     # Chunk
     chunks = chunk_texts(
@@ -70,9 +93,45 @@ def ingest(
         chunk_overlap=cfg.chunk_overlap,
     )
 
+    # When chunking, we need to map chunks back to original payloads
+    # For now, we'll create new payloads for chunks that reference the original
+    chunk_payloads = []
+    chunk_idx = 0
+    for i, text in enumerate(texts):
+        # Find how many chunks this text produced
+        # This is approximate - we'll use the original payload for each chunk
+        # In a more sophisticated implementation, you'd track chunk-to-text mapping
+        if chunk_idx < len(chunks):
+            # Use the payload from the source text
+            original_payload = payloads[i].copy()
+            original_payload["source"]["chunk_index"] = chunk_idx
+            chunk_payloads.append(original_payload)
+            chunk_idx += 1
+
+    # If we have fewer chunk payloads than chunks, pad with the last payload
+    while len(chunk_payloads) < len(chunks):
+        if payloads:
+            chunk_payloads.append(payloads[-1].copy())
+        else:
+            from .data_formatter import create_payload
+            from pathlib import Path
+            chunk_payloads.append(
+                create_payload(
+                    text=chunks[len(chunk_payloads)],
+                    ingested_from="excel",
+                    file_name=Path(excel_path).name,
+                    row_number=len(chunk_payloads) + 1,
+                    embedding_model=cfg.embedding_model,
+                )
+            )
+
     # Embeddings
     model = EmbeddingModel(cfg.embedding_model)
     embeddings = model.encode(chunks)
+
+    # Update payloads with embedding model name
+    for payload in chunk_payloads:
+        payload["embedding_model"] = cfg.embedding_model
 
     # Vector store backend selection
     if cfg.backend == "s3":
@@ -97,13 +156,14 @@ def ingest(
         f"[bold green]Storing {len(chunks)} embeddings into backend '{cfg.backend}'...[/bold green]"
     )
 
-    # Very simple metadata example; can be extended as needed.
-    metadatas = [{"source": "excel", "index": i} for i in range(len(chunks))]
-
     # Track progress if desired (per-chunk progress not strictly needed here).
     # We wrap the call for visual feedback.
     for _ in track(range(1), description="Writing to vector store..."):
-        store.add_embeddings(embeddings=embeddings, texts=chunks, metadatas=metadatas)
+        store.add_embeddings(
+            embeddings=embeddings,
+            texts=chunks,
+            payloads=chunk_payloads,
+        )
 
     console.print("[bold green]Ingestion completed successfully.[/bold green]")
 

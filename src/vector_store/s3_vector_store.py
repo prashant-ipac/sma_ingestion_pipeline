@@ -12,6 +12,7 @@ AWS "S3 vector engine" or search layer later.
 from __future__ import annotations
 
 import json
+import uuid
 from dataclasses import dataclass, asdict
 from io import BytesIO
 from typing import Iterable, List, Mapping, Sequence
@@ -20,6 +21,7 @@ import boto3
 import numpy as np
 
 from .base import VectorStore
+from ..data_formatter import create_payload
 from ..logging_utils import get_logger
 
 
@@ -31,7 +33,7 @@ class S3VectorIndexEntry:
     id: str
     text: str
     embedding_key: str
-    metadata: Mapping[str, object]
+    payload: Mapping[str, object]
 
 
 class S3VectorStore(VectorStore):
@@ -58,7 +60,7 @@ class S3VectorStore(VectorStore):
                     id=entry["id"],
                     text=entry["text"],
                     embedding_key=entry["embedding_key"],
-                    metadata=entry.get("metadata", {}),
+                    payload=entry.get("payload", entry.get("metadata", {})),  # Support both formats
                 )
                 for entry in raw
             ]
@@ -89,16 +91,46 @@ class S3VectorStore(VectorStore):
         embeddings: np.ndarray,
         texts: Sequence[str],
         metadatas: Iterable[Mapping[str, object]] | None = None,
+        payloads: Iterable[Mapping[str, object]] | None = None,
+        ids: Iterable[str] | None = None,
     ) -> None:
-        if metadatas is None:
-            metadatas = [{} for _ in texts]
-        metadatas_list = list(metadatas)
+        """
+        Add embeddings to S3 with structured payload format.
 
-        if len(embeddings) != len(texts):
-            raise ValueError("Embeddings and texts must have the same length.")
+        Args:
+            embeddings: Numpy array of embeddings
+            texts: Sequence of text strings
+            metadatas: Legacy metadata format (for backward compatibility)
+            payloads: New structured payload format (preferred)
+            ids: Optional list of UUID strings. If not provided, UUIDs will be generated.
+        """
+        if payloads is None:
+            # Legacy mode: convert simple metadatas to payload format
+            if metadatas is None:
+                metadatas = [{} for _ in texts]
+            metadatas_list = list(metadatas)
+            payloads = [
+                create_payload(
+                    text=text,
+                    ingested_from=meta.get("source", "excel"),
+                    file_name=meta.get("file_name", ""),
+                    row_number=meta.get("index", meta.get("row_number", 0)),
+                )
+                for text, meta in zip(texts, metadatas_list)
+            ]
+        else:
+            payloads = list(payloads)
+
+        if len(embeddings) != len(texts) or len(embeddings) != len(payloads):
+            raise ValueError("Embeddings, texts, and payloads must have the same length.")
+
+        # Generate UUIDs if not provided
+        if ids is None:
+            ids = [str(uuid.uuid4()) for _ in texts]
+        else:
+            ids = list(ids)
 
         index_entries = self._load_index()
-        start_idx = len(index_entries)
 
         logger.info(
             "Uploading %d embeddings to S3 bucket '%s' (prefix=%s)",
@@ -107,11 +139,8 @@ class S3VectorStore(VectorStore):
             self.embeddings_prefix,
         )
 
-        for offset, (embedding, text, metadata) in enumerate(
-            zip(embeddings, texts, metadatas_list)
-        ):
-            idx = start_idx + offset
-            emb_key = f"{self.embeddings_prefix}{idx}.npy"
+        for embedding, text, payload, entry_id in zip(embeddings, texts, payloads, ids):
+            emb_key = f"{self.embeddings_prefix}{entry_id}.npy"
             buffer = BytesIO()
             np.save(buffer, np.asarray(embedding))
             buffer.seek(0)
@@ -120,10 +149,10 @@ class S3VectorStore(VectorStore):
 
             index_entries.append(
                 S3VectorIndexEntry(
-                    id=str(idx),
+                    id=entry_id,
                     text=text,
                     embedding_key=emb_key,
-                    metadata=metadata,
+                    payload=payload,
                 )
             )
 
