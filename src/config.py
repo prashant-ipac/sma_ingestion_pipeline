@@ -34,6 +34,9 @@ class Config:
     # Embeddings
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-large")
     embedding_dim: int = int(os.getenv("EMBEDDING_DIM", str(DEFAULT_EMBEDDING_DIM)))
+    embedding_use_onnx: bool = os.getenv("EMBEDDING_USE_ONNX", "false").lower() == "true"
+    embedding_batch_size: int = int(os.getenv("EMBEDDING_BATCH_SIZE", "32"))
+    embedding_device: str | None = os.getenv("EMBEDDING_DEVICE", None)
 
     # Chunking
     chunking_strategy: str = os.getenv("CHUNKING_STRATEGY", "recursive")
@@ -59,6 +62,13 @@ class Config:
         "PGVECTOR_DSN", "postgresql://user:password@localhost:5432/social_vectors"
     )
     pgvector_table_name: str = os.getenv("PGVECTOR_TABLE_NAME", "embeddings")
+
+    # Milvus backend configuration
+    milvus_host: str = os.getenv("MILVUS_HOST", "localhost")
+    milvus_port: int = int(os.getenv("MILVUS_PORT", "19530"))
+    milvus_collection_name: str = os.getenv("MILVUS_COLLECTION_NAME", "social_media_embeddings")
+    milvus_user: str = os.getenv("MILVUS_USER", "db_9bc9fd3f17d2fc4")
+    milvus_password: str = os.getenv("MILVUS_PASSWORD", "Xt6+sy!)+g[<vVkE")
 
     # Logging
     log_level: str = os.getenv("LOG_LEVEL", "INFO")

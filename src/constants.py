@@ -4,7 +4,7 @@ Project-wide constants that are unlikely to change at runtime.
 
 from typing import Final, List
 
-SUPPORTED_BACKENDS: Final[List[str]] = ["s3", "chromadb", "pgvector"]
+SUPPORTED_BACKENDS: Final[List[str]] = ["s3", "chromadb", "pgvector", "milvus"]
 
 SUPPORTED_CHUNKING_STRATEGIES: Final[List[str]] = [
     "recursive",

@@ -15,7 +15,7 @@ from .logging_utils import configure_logging, get_logger
 from .data_loader import load_texts_from_excel, load_structured_data_from_excel
 from .chunking import chunk_texts
 from .embedding import EmbeddingModel
-from .vector_store import S3VectorStore, ChromaVectorStore, PgVectorStore
+from .vector_store import S3VectorStore, ChromaVectorStore, PgVectorStore, MilvusVectorStore
 
 
 app = typer.Typer(help="Social media Excel → embeddings → vector store pipeline")
@@ -30,7 +30,7 @@ def ingest(
         None, "--sheet-name", "-s", help="Sheet name in the Excel file (defaults to config/default)."
     ),
     backend: Optional[str] = typer.Option(
-        None, "--backend", "-b", help="Override vector store backend (s3|chromadb|pgvector)."
+        None, "--backend", "-b", help="Override vector store backend (s3|chromadb|pgvector|milvus)."
     ),
     chunking_strategy: Optional[str] = typer.Option(
         None, "--chunking-strategy", "-c", help="Override chunking strategy (recursive|fixed)."
@@ -126,7 +126,12 @@ def ingest(
             )
 
     # Embeddings
-    model = EmbeddingModel(cfg.embedding_model)
+    model = EmbeddingModel(
+        model_name=cfg.embedding_model,
+        use_onnx=cfg.embedding_use_onnx,
+        batch_size=cfg.embedding_batch_size,
+        device=cfg.embedding_device,
+    )
     embeddings = model.encode(chunks)
 
     # Update payloads with embedding model name
@@ -148,6 +153,15 @@ def ingest(
             dsn=cfg.pgvector_dsn,
             table_name=cfg.pgvector_table_name,
             embedding_dim=cfg.embedding_dim,
+        )
+    elif cfg.backend == "milvus":
+        store = MilvusVectorStore(
+            host=cfg.milvus_host,
+            port=cfg.milvus_port,
+            collection_name=cfg.milvus_collection_name,
+            embedding_dim=cfg.embedding_dim,
+            user=cfg.milvus_user,
+            password=cfg.milvus_password,
         )
     else:  # defensive, already validated
         raise typer.BadParameter(f"Unsupported backend: {cfg.backend}")
