@@ -71,9 +71,9 @@ class Config:
     milvus_password: str = os.getenv("MILVUS_PASSWORD", "Xt6+sy!)+g[<vVkE")
 
     #atlasdb backend configuration
-    atlasdb_uri: str = os.getenv("ATLASDB_URI", "mongodb://localhost:27017")
-    atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "social_media_embeddings")
-    atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "embeddings")
+    atlasdb_uri: str = os.getenv("ATLASDB_URI", "mongodb+srv://vinayh_ipac:Y6KDXC5F5rtDV5dn@cluster0.8ohmubv.mongodb.net/?appName=Cluster0")
+    atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "sma-ipac")
+    atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "instagram")
     atlasdb_embedding_dim: int = int(os.getenv("ATLASDB_EMBEDDING_DIM", "1024"))
     atlasdb_max_batch_size: int = int(os.getenv("ATLASDB_MAX_BATCH_SIZE", "1000"))
     atlasdb_index_name: str = os.getenv("ATLASDB_INDEX_NAME", "embeddings_index")
