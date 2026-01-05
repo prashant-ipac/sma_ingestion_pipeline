@@ -7,13 +7,12 @@ from .s3_vector_store import S3VectorStore
 from .chroma_vector_store import ChromaVectorStore
 from .pgvector_store import PgVectorStore
 from .milvus_vector_store import MilvusVectorStore
-
+from .atlasdb_vector_store import AtlasVectorStore
 __all__ = [
     "VectorStore",
     "S3VectorStore",
     "ChromaVectorStore",
     "PgVectorStore",
     "MilvusVectorStore",
+    "AtlasVectorStore",
 ]
-
-

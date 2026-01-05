@@ -15,7 +15,7 @@ from .logging_utils import configure_logging, get_logger
 from .data_loader import load_texts_from_excel, load_structured_data_from_excel
 from .chunking import chunk_texts
 from .embedding import EmbeddingModel
-from .vector_store import S3VectorStore, ChromaVectorStore, PgVectorStore, MilvusVectorStore
+from .vector_store import S3VectorStore, ChromaVectorStore, PgVectorStore, MilvusVectorStore, AtlasVectorStore
 
 
 app = typer.Typer(help="Social media Excel → embeddings → vector store pipeline")
@@ -30,7 +30,7 @@ def ingest(
         None, "--sheet-name", "-s", help="Sheet name in the Excel file (defaults to config/default)."
     ),
     backend: Optional[str] = typer.Option(
-        None, "--backend", "-b", help="Override vector store backend (s3|chromadb|pgvector|milvus)."
+        None, "--backend", "-b", help="Override vector store backend (s3|chromadb|pgvector|milvus|atlasdb)."
     ),
     chunking_strategy: Optional[str] = typer.Option(
         None, "--chunking-strategy", "-c", help="Override chunking strategy (recursive|fixed)."
@@ -162,6 +162,13 @@ def ingest(
             embedding_dim=cfg.embedding_dim,
             user=cfg.milvus_user,
             password=cfg.milvus_password,
+        )
+    elif cfg.backend == "atlasdb":
+        store = AtlasVectorStore(
+            uri=cfg.atlasdb_uri,
+            database_name=cfg.atlasdb_database_name,
+            collection_name=cfg.atlasdb_collection_name,
+            embedding_dim=cfg.embedding_dim,
         )
     else:  # defensive, already validated
         raise typer.BadParameter(f"Unsupported backend: {cfg.backend}")

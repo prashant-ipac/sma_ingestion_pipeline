@@ -11,6 +11,6 @@ pymilvus
 python-dotenv
 typer[all]
 rich
-    # Optional: For faster inference (2-4x speedup)
+# Optional: For faster inference (2-4x speedup)
 # onnxruntime  # Uncomment to enable ONNX Runtime support
 
