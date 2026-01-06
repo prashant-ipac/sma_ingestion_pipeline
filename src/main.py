@@ -167,7 +167,7 @@ def ingest(
         store = AtlasVectorStore(
             uri=cfg.atlasdb_uri,
             database_name=cfg.atlasdb_database_name,
-            collection_name=cfg.sheet_name,
+            collection_name=sheet_name,
             embedding_dim=cfg.embedding_dim,
         )
     else:  # defensive, already validated
