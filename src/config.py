@@ -7,6 +7,7 @@ Values are primarily sourced from environment variables.
 from dataclasses import dataclass, field
 import os
 from typing import List
+from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 
@@ -17,6 +18,9 @@ from .constants import (
     DEFAULT_EXCEL_SHEET_NAME,
     DEFAULT_EMBEDDING_DIM,
 )
+
+username = quote_plus("prashant")
+password = quote_plus("PPpp@674")
 
 
 load_dotenv()
@@ -71,7 +75,7 @@ class Config:
     milvus_password: str = os.getenv("MILVUS_PASSWORD", "Xt6+sy!)+g[<vVkE")
 
     #atlasdb backend configuration
-    atlasdb_uri: str = os.getenv("ATLASDB_URI", "mongodb+srv://prashant:PPpp@674@cluster0.yx6a7ib.mongodb.net/?appName=Cluster0")
+    atlasdb_uri: str = os.getenv("ATLASDB_URI", f"mongodb+srv://{username}:{password}@cluster0.yx6a7ib.mongodb.net/?appName=Cluster0")
     atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "socialmediaanalytics")
     atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "instagram")
     atlasdb_embedding_dim: int = int(os.getenv("ATLASDB_EMBEDDING_DIM", "1024"))
