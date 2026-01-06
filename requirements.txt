@@ -11,7 +11,7 @@ pymilvus
 python-dotenv
 typer[all]
 rich
-pymongo
+"pymongo[srv]==3.12"
 # Optional: For faster inference (2-4x speedup)
 # onnxruntime  # Uncomment to enable ONNX Runtime support
 
