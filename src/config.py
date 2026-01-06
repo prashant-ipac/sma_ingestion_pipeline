@@ -20,7 +20,7 @@ from .constants import (
 )
 
 username = quote_plus("prashant")
-password = quote_plus("PPpp@674")
+password = quote_plus("PPpp674")
 
 
 load_dotenv()
