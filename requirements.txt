@@ -12,6 +12,10 @@ python-dotenv
 typer[all]
 rich
 pymongo[srv]==3.12
+voyageai 
+numpy
+
+
 # Optional: For faster inference (2-4x speedup)
 # onnxruntime  # Uncomment to enable ONNX Runtime support
 
