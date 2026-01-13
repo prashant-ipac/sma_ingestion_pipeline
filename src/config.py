@@ -19,8 +19,8 @@ from .constants import (
     DEFAULT_EMBEDDING_DIM,
 )
 
-username = quote_plus("prashant")
-password = quote_plus("PPpp674")
+username = quote_plus("sma_user")
+password = quote_plus("1234@Sma")
 
 
 load_dotenv()
@@ -75,9 +75,9 @@ class Config:
     milvus_password: str = os.getenv("MILVUS_PASSWORD", "Xt6+sy!)+g[<vVkE")
 
     #atlasdb backend configuration
-    atlasdb_uri: str = os.getenv("ATLASDB_URI", f"mongodb+srv://{username}:{password}@cluster0.yx6a7ib.mongodb.net/?retryWrites=true&w=majority")
-    atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "socialmediaanalytics")
-    atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "instagram")
+    atlasdb_uri: str = os.getenv("ATLASDB_URI", f"mongodb+srv://{username}:{password}@cluster0.tnr5pgy.mongodb.net/?appName=cluster0")
+    atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "sma_vectordb")
+    atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "Instagram")
     atlasdb_embedding_dim: int = int(os.getenv("ATLASDB_EMBEDDING_DIM", "1024"))
     atlasdb_max_batch_size: int = int(os.getenv("ATLASDB_MAX_BATCH_SIZE", "1000"))
     atlasdb_index_name: str = os.getenv("ATLASDB_INDEX_NAME", "vector_index")
