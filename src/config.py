@@ -10,6 +10,7 @@ from typing import List
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
+load_dotenv()
 
 from .constants import (
     SUPPORTED_BACKENDS,
@@ -19,8 +20,8 @@ from .constants import (
     DEFAULT_EMBEDDING_DIM,
 )
 
-username = quote_plus("prashant")
-password = quote_plus("PPpp674")
+username = quote_plus("vinayh_ipac")
+password = quote_plus("Y6KDXC5F5rtDV5dn")
 
 
 load_dotenv()
@@ -75,7 +76,7 @@ class Config:
     milvus_password: str = os.getenv("MILVUS_PASSWORD", "Xt6+sy!)+g[<vVkE")
 
     #atlasdb backend configuration
-    atlasdb_uri: str = os.getenv("ATLASDB_URI", f"mongodb+srv://{username}:{password}@cluster0.yx6a7ib.mongodb.net/?retryWrites=true&w=majority")
+    atlasdb_uri: str = os.getenv("ATLASDB_URI", f"mongodb+srv://{username}:{password}@cluster0.8ohmubv.mongodb.net/?retryWrites=true&w=majority")
     atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "socialmediaanalytics")
     atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "instagram")
     atlasdb_embedding_dim: int = int(os.getenv("ATLASDB_EMBEDDING_DIM", "1024"))
