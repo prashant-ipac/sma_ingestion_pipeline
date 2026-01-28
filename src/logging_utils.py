@@ -1,106 +1,74 @@
-# """
-# Simple logging configuration utility.
-# """
-
-# import logging
-# from typing import Optional
-
-
-# def configure_logging(level: str = "INFO") -> None:
-#     numeric_level: int = getattr(logging, level.upper(), logging.INFO)
-#     logging.basicConfig(
-#         level=numeric_level,
-#         format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-#     )
-
-
-# def get_logger(name: Optional[str] = None) -> logging.Logger:
-#     return logging.getLogger(name or __name__)
-
-
-
 """
-Simple logging configuration utility.
+Logging configuration utility.
 
-Fixes common "no logs printing" issues by:
-- forcing handler configuration (force=True) so basicConfig applies even if handlers already exist
-- optionally using RichHandler when rich is installed
+Writes logs to:
+- Console (stdout)
+- Rotating log file (logs/sma_ingestion.log by default)
 """
 
 from __future__ import annotations
 
 import logging
 import os
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Optional
 
 
 def configure_logging(
     level: str = "INFO",
-    *,
-    use_rich: bool | None = None,
+    log_file: Optional[str] = None,
+    max_bytes: int = 10 * 1024 * 1024,  # 10 MB
+    backup_count: int = 5,
 ) -> None:
     """
-    Configure root logging.
+    Configure root logging. Call once early in main().
 
     Args:
-        level: Log level string (DEBUG|INFO|WARNING|ERROR)
-        use_rich: If True, use rich.logging.RichHandler for pretty console output.
-                  If None, auto-enable when RICH_LOGGING=true in env (default: auto).
+        level: INFO/DEBUG/WARNING/ERROR
+        log_file: path to log file. If None, reads LOG_FILE env or defaults to logs/sma_ingestion.log
+        max_bytes: rotate when log reaches this size
+        backup_count: number of rotated backups to keep
     """
-    # Resolve level
-    level = (level or os.getenv("LOG_LEVEL", "INFO")).upper()
-    numeric_level: int = getattr(logging, level, logging.INFO)
+    numeric_level = getattr(logging, level.upper(), logging.INFO)
 
-    # Decide rich logging
-    if use_rich is None:
-        use_rich = os.getenv("RICH_LOGGING", "true").lower() in ("true", "1", "yes", "y", "on")
+    # Pick log file path
+    log_file = log_file or os.getenv("LOG_FILE", "logs/sma_ingestion.log")
 
-    # Common format (used when not using RichHandler)
-    log_format = os.getenv(
-        "LOG_FORMAT",
-        "%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+    # Ensure directory exists
+    log_path = Path(log_file)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s - %(message)s")
+
+    root = logging.getLogger()
+    root.setLevel(numeric_level)
+
+    # IMPORTANT: avoid duplicate handlers if configure_logging() called again
+    if root.handlers:
+        for h in list(root.handlers):
+            root.removeHandler(h)
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(numeric_level)
+    console_handler.setFormatter(fmt)
+
+    # File handler (rotating)
+    file_handler = RotatingFileHandler(
+        filename=str(log_path),
+        maxBytes=max_bytes,
+        backupCount=backup_count,
+        encoding="utf-8",
     )
-    date_format = os.getenv("LOG_DATE_FORMAT", "%Y-%m-%d %H:%M:%S")
+    file_handler.setLevel(numeric_level)
+    file_handler.setFormatter(fmt)
 
-    handlers: list[logging.Handler] | None = None
+    root.addHandler(console_handler)
+    root.addHandler(file_handler)
 
-    if use_rich:
-        try:
-            from rich.logging import RichHandler  # type: ignore
-
-            # RichHandler shows time/level/message nicely; avoid double time by omitting %(asctime)s
-            handlers = [
-                RichHandler(
-                    rich_tracebacks=True,
-                    tracebacks_show_locals=False,
-                    show_time=True,
-                    show_level=True,
-                    show_path=False,
-                )
-            ]
-            # When using RichHandler, format should not include asctime (Rich prints it)
-            log_format = "%(name)s - %(message)s"
-        except Exception:
-            # If rich isn't available for some reason, fall back to basic logging.
-            handlers = None
-
-    # IMPORTANT: force=True ensures config is applied even if some other lib already configured logging.
-    logging.basicConfig(
-        level=numeric_level,
-        format=log_format,
-        datefmt=date_format,
-        handlers=handlers,
-        force=True,
-    )
-
-    # Optional: reduce noisy third-party logs (tune as needed)
-    noisy = os.getenv("LOG_NOISY_LIBS", "urllib3,boto3,botocore,matplotlib,PIL").split(",")
-    for name in [n.strip() for n in noisy if n.strip()]:
-        logging.getLogger(name).setLevel(logging.WARNING)
+    root.info("Logging initialized: level=%s log_file=%s", level.upper(), str(log_path))
 
 
 def get_logger(name: Optional[str] = None) -> logging.Logger:
-    """
-    Get a logger. Assumes configure_logging() has been called once in the entrypoint.
-    """
     return logging.getLogger(name or __name__)
