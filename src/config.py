@@ -22,7 +22,10 @@ from .constants import (
     DEFAULT_EMBEDDING_DIM,
 )
 
-# Load .env once at import time
+username = quote_plus("sma_user")
+password = quote_plus("1234@Sma")
+
+
 load_dotenv()
 
 
@@ -115,18 +118,15 @@ class Config:
     milvus_host: str = os.getenv("MILVUS_HOST", "localhost")
     milvus_port: int = _get_env_int("MILVUS_PORT", 19530)
     milvus_collection_name: str = os.getenv("MILVUS_COLLECTION_NAME", "social_media_embeddings")
-    milvus_user: str = os.getenv("MILVUS_USER", "")
-    milvus_password: str = os.getenv("MILVUS_PASSWORD", "")
+    milvus_user: str = os.getenv("MILVUS_USER", "db_9bc9fd3f17d2fc4")
+    milvus_password: str = os.getenv("MILVUS_PASSWORD", "Xt6+sy!)+g[<vVkE")
 
-    # -----------------------
-    # AtlasDB / MongoDB
-    # -----------------------
-    # Recommended: supply full ATLASDB_URI in .env
-    atlasdb_uri: str = os.getenv("ATLASDB_URI", "")
-    atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "socialmediaanalytics")
-    atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "instagram")
-    atlasdb_embedding_dim: int = _get_env_int("ATLASDB_EMBEDDING_DIM", 1024)
-    atlasdb_max_batch_size: int = _get_env_int("ATLASDB_MAX_BATCH_SIZE", 1000)
+    #atlasdb backend configuration
+    atlasdb_uri: str = os.getenv("ATLASDB_URI", f"mongodb+srv://{username}:{password}@cluster0.tnr5pgy.mongodb.net/?appName=cluster0")
+    atlasdb_database_name: str = os.getenv("ATLASDB_DATABASE_NAME", "sma_vectordb")
+    atlasdb_collection_name: str = os.getenv("ATLASDB_COLLECTION_NAME", "Instagram")
+    atlasdb_embedding_dim: int = int(os.getenv("ATLASDB_EMBEDDING_DIM", "1024"))
+    atlasdb_max_batch_size: int = int(os.getenv("ATLASDB_MAX_BATCH_SIZE", "1000"))
     atlasdb_index_name: str = os.getenv("ATLASDB_INDEX_NAME", "vector_index")
 
     # Optional helpers (only used to build URI if ATLASDB_URI is not set)
