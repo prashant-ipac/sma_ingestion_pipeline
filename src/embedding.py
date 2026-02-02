@@ -111,6 +111,24 @@ from .logging_utils import get_logger
 logger = get_logger(__name__)
 
 
+def _safe_shape(arr) -> str:
+    try:
+        return str(arr.shape)
+    except Exception:
+        return "<unknown>"
+
+
+def _text_stats(texts: List[str]) -> Tuple[int, int, float]:
+    """
+    Returns (min_len, max_len, avg_len) in characters.
+    Useful to debug Voyage token limit errors & batching.
+    """
+    if not texts:
+        return (0, 0, 0.0)
+    lens = [len(t or "") for t in texts]
+    return (min(lens), max(lens), sum(lens) / len(lens))
+
+
 class EmbeddingModel:
     """
     Thin wrapper around VoyageAI embeddings.

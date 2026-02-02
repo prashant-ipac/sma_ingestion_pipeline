@@ -1,0 +1,47 @@
+# ----------------------
+# Python bytecode / cache
+# ----------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# If you have caches inside src explicitly
+src/__pycache__/
+src/**/__pycache__/
+
+# ----------------------
+# Virtual environments
+# ----------------------
+.venv/
+venv/
+ENV/
+
+# ----------------------
+# Environment files (secrets)
+# ----------------------
+.env
+.env.*
+!.env.example
+
+# ----------------------
+# Common OS / editor junk
+# ----------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------
+# Test / tooling caches
+# ----------------------
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+htmlcov/
+
+# ----------------------
+# Build / dist
+# ----------------------
+build/
+dist/
+*.egg-info/

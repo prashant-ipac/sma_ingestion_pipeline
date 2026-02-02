@@ -11,6 +11,12 @@ SUPPORTED_CHUNKING_STRATEGIES: Final[List[str]] = [
     "fixed",
 ]
 
+# ✅ Add supported embedding providers
+SUPPORTED_EMBEDDING_PROVIDERS: Final[List[str]] = [
+    "sentence_transformers",
+    "voyage",
+]
+
 # Default Excel-related constants
 DEFAULT_EXCEL_SHEET_NAME: Final[str] = "Sheet1"
 
@@ -22,7 +28,5 @@ DEFAULT_TEXT_COLUMNS: Final[List[str]] = [
     "message",
 ]
 
-# Default embedding dimension for intfloat/e5-large-v2
+# Default embedding dimension (used in multiple places)
 DEFAULT_EMBEDDING_DIM: Final[int] = 1024
-
-
