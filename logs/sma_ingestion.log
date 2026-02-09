@@ -438,3 +438,1184 @@ psycopg2.errors.DataException: expected 2048 dimensions, not 1024
 2026-01-28 19:23:19,686 [INFO] src.vector_store.pgvector_store - Inserting 99 embeddings into table 'embeddings' via pgvector
 2026-01-28 19:23:20,895 [INFO] __main__ - ✅ END: Write embeddings to vector store | 1.22s
 2026-01-28 19:23:20,898 [INFO] __main__ - Ingestion completed successfully.
+2026-02-02 13:37:39,339 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 13:37:39,339 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'intfloat/multilingual-e5-large', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': None, 'embedding_use_onnx': False, 'voyage_input_type': None, 'voyage_truncation': None, 'voyage_output_dimension': None, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma_vectordb', 'atlasdb_collection_name': 'Instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'embeddings', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['post', 'comment', 'text', 'message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 13:37:39,347 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=intfloat/multilingual-e5-large
+2026-02-02 13:37:39,347 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['post', 'comment', 'text', 'message']
+2026-02-02 13:37:39,348 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['post', 'comment', 'text', 'message'] embedding_model=intfloat/multilingual-e5-large
+2026-02-02 13:37:39,349 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=27.18MB
+2026-02-02 13:37:48,555 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=5.14s
+2026-02-02 13:37:48,563 [INFO] src.data_loader - Using text columns: ['text']
+2026-02-02 13:37:52,049 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=3.49s
+2026-02-02 13:37:52,052 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-02 13:37:52,053 [INFO] __main__ - ✅ END: Load Excel data | 12.71s
+2026-02-02 13:37:52,054 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 13:37:52,054 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 13:37:52,432 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-02 13:37:52,432 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-02 13:37:52,433 [INFO] __main__ - ✅ END: Chunk texts | 0.38s
+2026-02-02 13:37:59,529 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-02 13:37:59,531 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-02 13:37:59,559 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-02 13:37:59,559 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.03s
+2026-02-02 13:37:59,560 [INFO] __main__ - Embedding config: provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32 device=None onnx=False input_type=None out_dim=None dtype=float
+2026-02-02 13:37:59,560 [INFO] __main__ - ▶ START: Create embeddings | model=intfloat/multilingual-e5-large batch_size=32
+2026-02-02 13:37:59,560 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.00s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 258, in ingest
+    model = EmbeddingModel(
+TypeError: EmbeddingModel.__init__() got an unexpected keyword argument 'provider'
+2026-02-02 13:42:52,287 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 13:42:52,287 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'intfloat/multilingual-e5-large', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': None, 'embedding_use_onnx': False, 'voyage_input_type': None, 'voyage_truncation': None, 'voyage_output_dimension': None, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma_vectordb', 'atlasdb_collection_name': 'Instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'embeddings', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['post', 'comment', 'text', 'message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 13:42:52,297 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=intfloat/multilingual-e5-large
+2026-02-02 13:42:52,297 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['post', 'comment', 'text', 'message']
+2026-02-02 13:42:52,298 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['post', 'comment', 'text', 'message'] embedding_model=intfloat/multilingual-e5-large
+2026-02-02 13:42:52,298 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=27.18MB
+2026-02-02 13:43:00,928 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=4.93s
+2026-02-02 13:43:00,929 [INFO] src.data_loader - Using text columns: ['text']
+2026-02-02 13:43:04,414 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=3.49s
+2026-02-02 13:43:04,418 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-02 13:43:04,419 [INFO] __main__ - ✅ END: Load Excel data | 12.12s
+2026-02-02 13:43:04,419 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 13:43:04,420 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 13:43:04,796 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-02 13:43:04,796 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-02 13:43:04,797 [INFO] __main__ - ✅ END: Chunk texts | 0.38s
+2026-02-02 13:43:11,304 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-02 13:43:11,309 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-02 13:43:11,340 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-02 13:43:11,340 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.03s
+2026-02-02 13:43:11,341 [INFO] __main__ - Embedding config: provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32 device=None onnx=False input_type=None out_dim=None dtype=float
+2026-02-02 13:43:11,341 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32
+2026-02-02 13:43:11,341 [INFO] src.embedding - Initialized sentence_transformers (model=intfloat/multilingual-e5-large, device=None, onnx=False)
+2026-02-02 13:43:11,342 [INFO] src.embedding - Encoding 23941 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 13:43:11,342 [INFO] src.embedding - Loading sentence_transformers model 'intfloat/multilingual-e5-large'...
+2026-02-02 13:43:11,344 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 13:43:11,344 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: intfloat/multilingual-e5-large
+2026-02-02 13:43:11,897 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:43:11,912 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:11,939 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:12,170 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:43:12,401 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:43:12,633 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:43:12,646 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/README.md "HTTP/1.1 200 OK"
+2026-02-02 13:43:12,656 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/README.md "HTTP/1.1 200 OK"
+2026-02-02 13:43:12,883 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:43:12,895 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:13,110 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:43:13,121 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:13,130 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:13,389 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:43:13,629 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:43:13,633 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 13:43:13,651 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:13,666 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 13:43:13,966 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 13:43:14,237 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/xet-read-token/0dc5580a448e4284468b8909bae50fa925907bc5 "HTTP/1.1 200 OK"
+2026-02-02 13:44:16,160 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 13:44:16,161 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'intfloat/multilingual-e5-large', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': None, 'embedding_use_onnx': False, 'voyage_input_type': None, 'voyage_truncation': None, 'voyage_output_dimension': None, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma_vectordb', 'atlasdb_collection_name': 'Instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'embeddings', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['post', 'comment', 'text', 'message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 13:44:16,172 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Youtube backend=pgvector chunking=recursive model=intfloat/multilingual-e5-large
+2026-02-02 13:44:16,173 [INFO] __main__ - ▶ START: Load Excel data | sheet=Youtube text_columns=['post', 'comment', 'text', 'message']
+2026-02-02 13:44:16,174 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Youtube expected_columns=['post', 'comment', 'text', 'message'] embedding_model=intfloat/multilingual-e5-large
+2026-02-02 13:44:16,174 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Youtube size=27.18MB
+2026-02-02 13:44:25,037 [INFO] src.data_loader - Excel read complete: rows=6681 cols=5 time=4.68s
+2026-02-02 13:44:25,037 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 13:44:26,126 [INFO] src.data_loader - Structured load complete: rows=6681 used_rows=5406 blank_rows=1275 texts=5406 time=1.09s
+2026-02-02 13:44:26,128 [INFO] __main__ - Loaded structured rows: texts=5406 payloads=5406
+2026-02-02 13:44:26,129 [INFO] __main__ - ✅ END: Load Excel data | 9.96s
+2026-02-02 13:44:26,130 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 13:44:26,130 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 13:44:26,300 [INFO] src.chunking - Recursive chunking produced 12885 chunks
+2026-02-02 13:44:26,301 [INFO] __main__ - Chunking output: chunks=12885 (from texts=5406)
+2026-02-02 13:44:26,301 [INFO] __main__ - ✅ END: Chunk texts | 0.17s
+2026-02-02 13:44:30,464 [INFO] __main__ - Cleaned chunks: cleaned=12885 original=12885
+2026-02-02 13:44:30,466 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=5406 chunks=12885
+2026-02-02 13:44:30,479 [INFO] __main__ - Payload mapping complete: 12885 payloads for 12885 chunks
+2026-02-02 13:44:30,479 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.01s
+2026-02-02 13:44:30,479 [INFO] __main__ - Embedding config: provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32 device=None onnx=False input_type=None out_dim=None dtype=float
+2026-02-02 13:44:30,479 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32
+2026-02-02 13:44:30,480 [INFO] src.embedding - Initialized sentence_transformers (model=intfloat/multilingual-e5-large, device=None, onnx=False)
+2026-02-02 13:44:30,480 [INFO] src.embedding - Encoding 12885 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 13:44:30,480 [INFO] src.embedding - Loading sentence_transformers model 'intfloat/multilingual-e5-large'...
+2026-02-02 13:44:30,481 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 13:44:30,481 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: intfloat/multilingual-e5-large
+2026-02-02 13:44:30,837 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:44:30,855 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:44:31,087 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:44:31,324 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:44:31,576 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:44:31,589 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/README.md "HTTP/1.1 200 OK"
+2026-02-02 13:44:31,817 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:44:31,842 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:44:32,071 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:44:32,090 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:44:32,334 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:44:32,576 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:44:32,802 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 13:44:33,098 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 13:44:33,341 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/xet-read-token/0dc5580a448e4284468b8909bae50fa925907bc5 "HTTP/1.1 200 OK"
+2026-02-02 13:45:46,176 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:45:46,179 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 13:45:46,194 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 13:45:46,427 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:45:46,446 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:45:46,469 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:45:46,710 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 13:45:46,954 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 13:45:47,197 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/sentencepiece.bpe.model "HTTP/1.1 302 Found"
+2026-02-02 13:45:49,212 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-02 13:45:50,691 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/added_tokens.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:45:50,937 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/special_tokens_map.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:45:50,968 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-02-02 13:45:51,005 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-02-02 13:45:51,258 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-02-02 13:46:03,910 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 13:46:04,645 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:46:04,660 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 13:46:04,680 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 13:46:04,934 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 13:46:05,299 [INFO] src.embedding - Model loaded.
+2026-02-02 13:53:51,918 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 13:53:51,918 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'intfloat/multilingual-e5-large', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': None, 'embedding_use_onnx': False, 'voyage_input_type': None, 'voyage_truncation': None, 'voyage_output_dimension': None, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma_vectordb', 'atlasdb_collection_name': 'Instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'embeddings', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['post', 'comment', 'text', 'message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 13:53:51,929 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Youtube backend=pgvector chunking=recursive model=intfloat/multilingual-e5-large
+2026-02-02 13:53:51,930 [INFO] __main__ - ▶ START: Load Excel data | sheet=Youtube text_columns=['post', 'comment', 'text', 'message']
+2026-02-02 13:53:51,931 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Youtube expected_columns=['post', 'comment', 'text', 'message'] embedding_model=intfloat/multilingual-e5-large
+2026-02-02 13:53:51,931 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Youtube size=27.18MB
+2026-02-02 13:53:59,640 [INFO] src.data_loader - Excel read complete: rows=6681 cols=5 time=3.93s
+2026-02-02 13:53:59,643 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 13:54:00,624 [INFO] src.data_loader - Structured load complete: rows=6681 used_rows=5406 blank_rows=1275 texts=5406 time=0.98s
+2026-02-02 13:54:00,625 [INFO] __main__ - Loaded structured rows: texts=5406 payloads=5406
+2026-02-02 13:54:00,626 [INFO] __main__ - ✅ END: Load Excel data | 8.70s
+2026-02-02 13:54:00,627 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 13:54:00,627 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 13:54:00,797 [INFO] src.chunking - Recursive chunking produced 12885 chunks
+2026-02-02 13:54:00,797 [INFO] __main__ - Chunking output: chunks=12885 (from texts=5406)
+2026-02-02 13:54:00,798 [INFO] __main__ - ✅ END: Chunk texts | 0.17s
+2026-02-02 13:54:04,420 [INFO] __main__ - Cleaned chunks: cleaned=12885 original=12885
+2026-02-02 13:54:04,422 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=5406 chunks=12885
+2026-02-02 13:54:04,436 [INFO] __main__ - Payload mapping complete: 12885 payloads for 12885 chunks
+2026-02-02 13:54:04,436 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.01s
+2026-02-02 13:54:04,436 [INFO] __main__ - Embedding config: provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32 device=None onnx=False input_type=None out_dim=None dtype=float
+2026-02-02 13:54:04,436 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32
+2026-02-02 13:54:04,437 [INFO] src.embedding - Initialized sentence_transformers (model=intfloat/multilingual-e5-large, device=None, onnx=False)
+2026-02-02 13:54:04,437 [INFO] src.embedding - Encoding 12885 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 13:54:04,437 [INFO] src.embedding - Loading sentence_transformers model 'intfloat/multilingual-e5-large'...
+2026-02-02 13:54:04,438 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 13:54:04,438 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: intfloat/multilingual-e5-large
+2026-02-02 13:54:04,863 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:04,879 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:05,110 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:54:05,352 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:54:05,579 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:05,594 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/README.md "HTTP/1.1 200 OK"
+2026-02-02 13:54:05,824 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:05,826 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 13:54:05,841 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:06,076 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:06,089 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:06,312 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 13:54:06,535 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:06,768 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:07,909 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:07,927 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:08,157 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:08,166 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:08,394 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 13:54:08,627 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 13:54:11,233 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 13:54:11,952 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 13:54:11,962 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 13:54:12,210 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 13:54:12,714 [INFO] src.embedding - Model loaded.
+2026-02-02 15:23:43,306 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 15:23:43,306 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'intfloat/multilingual-e5-large', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': None, 'embedding_use_onnx': False, 'voyage_input_type': None, 'voyage_truncation': None, 'voyage_output_dimension': None, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma_vectordb', 'atlasdb_collection_name': 'Instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'embeddings', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['post', 'comment', 'text', 'message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 15:23:43,313 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=intfloat/multilingual-e5-large
+2026-02-02 15:23:43,314 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['post', 'comment', 'text', 'message']
+2026-02-02 15:23:43,314 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['post', 'comment', 'text', 'message'] embedding_model=intfloat/multilingual-e5-large
+2026-02-02 15:23:43,315 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 15:23:51,272 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.00s
+2026-02-02 15:23:51,272 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 15:23:51,291 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-02 15:23:51,292 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 15:23:51,292 [INFO] __main__ - ✅ END: Load Excel data | 7.98s
+2026-02-02 15:23:51,293 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 15:23:51,293 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 15:23:51,295 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 15:23:51,296 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 15:23:51,297 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-02 15:23:51,326 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 15:23:51,327 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 15:23:51,327 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 15:23:51,327 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 15:23:51,327 [INFO] __main__ - Embedding config: provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32 device=None onnx=False input_type=None out_dim=None dtype=float
+2026-02-02 15:23:51,328 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32
+2026-02-02 15:23:51,328 [INFO] src.embedding - Initialized sentence_transformers (model=intfloat/multilingual-e5-large, device=None, onnx=False)
+2026-02-02 15:23:51,328 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 15:23:51,328 [INFO] src.embedding - Loading sentence_transformers model 'intfloat/multilingual-e5-large'...
+2026-02-02 15:23:51,330 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 15:23:51,330 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: intfloat/multilingual-e5-large
+2026-02-02 15:23:51,641 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:51,655 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:51,899 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 15:23:52,132 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 15:23:52,133 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 15:23:52,354 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:52,366 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/README.md "HTTP/1.1 200 OK"
+2026-02-02 15:23:52,594 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:52,604 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:52,829 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:52,842 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:53,070 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 15:23:53,304 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:53,322 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:54,495 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:54,540 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:54,804 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:54,830 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:55,082 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 15:23:55,321 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 15:23:58,572 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 15:23:59,178 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:23:59,193 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 15:23:59,437 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 15:23:59,734 [INFO] src.embedding - Model loaded.
+2026-02-02 15:25:16,208 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 15:25:16,210 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 15:25:16,220 [INFO] __main__ - ✅ END: Create embeddings | 84.89s
+2026-02-02 15:25:16,221 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 15:25:16,348 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'embeddings' exist
+2026-02-02 15:25:16,498 [INFO] __main__ - ✅ END: Init vector store | 0.28s
+2026-02-02 15:25:16,499 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-02 15:25:16,499 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-02 15:25:16,508 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'embeddings' via pgvector
+2026-02-02 15:25:17,270 [ERROR] __main__ - ❌ FAIL: Write embeddings to vector store | 0.77s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 345, in ingest
+    store.add_embeddings(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 114, in add_embeddings
+    execute_values(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/psycopg2/extras.py", line 1299, in execute_values
+    cur.execute(b''.join(parts))
+psycopg2.errors.InvalidSchemaName: schema "np" does not exist
+LINE 1: ..._model": "intfloat/multilingual-e5-large"}',ARRAY[np.float64...
+                                                             ^
+
+2026-02-02 15:28:06,440 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 15:28:06,441 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'intfloat/multilingual-e5-large', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': None, 'embedding_use_onnx': False, 'voyage_input_type': None, 'voyage_truncation': None, 'voyage_output_dimension': None, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma_vectordb', 'atlasdb_collection_name': 'Instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'embeddings', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['post', 'comment', 'text', 'message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 15:28:06,450 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=intfloat/multilingual-e5-large
+2026-02-02 15:28:06,450 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['post', 'comment', 'text', 'message']
+2026-02-02 15:28:06,450 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['post', 'comment', 'text', 'message'] embedding_model=intfloat/multilingual-e5-large
+2026-02-02 15:28:06,451 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 15:28:14,150 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=3.78s
+2026-02-02 15:28:14,156 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 15:28:14,177 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-02 15:28:14,177 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 15:28:14,178 [INFO] __main__ - ✅ END: Load Excel data | 7.73s
+2026-02-02 15:28:14,178 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 15:28:14,178 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 15:28:14,181 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 15:28:14,182 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 15:28:14,184 [INFO] __main__ - ✅ END: Chunk texts | 0.01s
+2026-02-02 15:28:14,219 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 15:28:14,220 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 15:28:14,220 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 15:28:14,220 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 15:28:14,220 [INFO] __main__ - Embedding config: provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32 device=None onnx=False input_type=None out_dim=None dtype=float
+2026-02-02 15:28:14,220 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=intfloat/multilingual-e5-large batch_size=32
+2026-02-02 15:28:14,221 [INFO] src.embedding - Initialized sentence_transformers (model=intfloat/multilingual-e5-large, device=None, onnx=False)
+2026-02-02 15:28:14,221 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 15:28:14,221 [INFO] src.embedding - Loading sentence_transformers model 'intfloat/multilingual-e5-large'...
+2026-02-02 15:28:14,223 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 15:28:14,223 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: intfloat/multilingual-e5-large
+2026-02-02 15:28:14,555 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:14,571 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:14,806 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 15:28:15,038 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config_sentence_transformers.json "HTTP/1.1 404 Not Found"
+2026-02-02 15:28:15,263 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:15,276 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/README.md "HTTP/1.1 200 OK"
+2026-02-02 15:28:15,503 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:15,520 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/modules.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:15,815 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:15,830 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:16,071 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 15:28:16,292 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:16,303 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:17,353 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:17,357 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 15:28:17,370 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/config.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:17,602 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:17,611 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:17,844 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 15:28:18,092 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 15:28:21,137 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 15:28:21,855 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/intfloat/multilingual-e5-large/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 15:28:21,871 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/intfloat/multilingual-e5-large/0dc5580a448e4284468b8909bae50fa925907bc5/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 15:28:22,124 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/intfloat/multilingual-e5-large "HTTP/1.1 200 OK"
+2026-02-02 15:28:22,613 [INFO] src.embedding - Model loaded.
+2026-02-02 15:29:44,052 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 15:29:44,056 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 15:29:44,067 [INFO] __main__ - ✅ END: Create embeddings | 89.85s
+2026-02-02 15:29:44,067 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 15:29:44,167 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'embeddings' exist
+2026-02-02 15:29:44,181 [INFO] __main__ - ✅ END: Init vector store | 0.11s
+2026-02-02 15:29:44,183 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-02 15:29:44,183 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-02 15:29:44,189 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'embeddings' via pgvector
+2026-02-02 15:29:44,592 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.41s
+2026-02-02 15:29:44,593 [INFO] __main__ - Ingestion completed successfully.
+2026-02-02 16:16:40,484 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 16:16:40,485 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['text'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 16:16:40,495 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 16:16:40,495 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['text']
+2026-02-02 16:16:40,496 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['text'] embedding_model=BAAI/bge-m3
+2026-02-02 16:16:40,496 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 16:16:50,227 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.69s
+2026-02-02 16:16:50,231 [ERROR] src.data_loader - None of expected text columns found. expected=['text'] available=['State', 'Date', 'Username', 'Message', 'Post Link', 'Post Type', 'Engagement'] suggestions=<none>
+2026-02-02 16:16:50,233 [WARNING] __main__ - Structured loader failed; falling back to simple loader. Error=None of the expected text columns ['text'] were found. Available columns: ['State', 'Date', 'Username', 'Message', 'Post Link', 'Post Type', 'Engagement']. Suggestions: none
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 145, in ingest
+    texts, payloads = load_structured_data_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 199, in load_structured_data_from_excel
+    raise ValueError(
+ValueError: None of the expected text columns ['text'] were found. Available columns: ['State', 'Date', 'Username', 'Message', 'Post Link', 'Post Type', 'Engagement']. Suggestions: none
+2026-02-02 16:16:50,235 [INFO] src.data_loader - load_texts_from_excel(): sheet=sample expected_columns=['text']
+2026-02-02 16:16:50,236 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 16:16:58,561 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.16s
+2026-02-02 16:16:58,561 [ERROR] src.data_loader - None of expected text columns found. expected=['text'] available=['State', 'Date', 'Username', 'Message', 'Post Link', 'Post Type', 'Engagement'] suggestions=<none>
+2026-02-02 16:16:58,561 [ERROR] __main__ - ❌ FAIL: Load Excel data | 18.07s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 145, in ingest
+    texts, payloads = load_structured_data_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 199, in load_structured_data_from_excel
+    raise ValueError(
+ValueError: None of the expected text columns ['text'] were found. Available columns: ['State', 'Date', 'Username', 'Message', 'Post Link', 'Post Type', 'Engagement']. Suggestions: none
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 156, in ingest
+    texts = load_texts_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 134, in load_texts_from_excel
+    raise ValueError(
+ValueError: None of the expected text columns ['text'] were found. Available columns: ['State', 'Date', 'Username', 'Message', 'Post Link', 'Post Type', 'Engagement']. Suggestions: none
+2026-02-02 16:18:17,658 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 16:18:17,658 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 16:18:17,668 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 16:18:17,669 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-02 16:18:17,669 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-02 16:18:17,670 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 16:18:25,709 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=3.96s
+2026-02-02 16:18:25,710 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 16:18:25,733 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-02 16:18:25,733 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 16:18:25,734 [INFO] __main__ - ✅ END: Load Excel data | 8.06s
+2026-02-02 16:18:25,735 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 16:18:25,735 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 16:18:25,737 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 16:18:25,737 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 16:18:25,738 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-02 16:18:25,774 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 16:18:25,775 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 16:18:25,775 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 16:18:25,775 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 16:18:25,776 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-02 16:18:25,776 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-02 16:18:25,776 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-02 16:18:25,776 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 16:18:25,777 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-02 16:18:25,780 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 16:18:25,780 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-02 16:18:26,176 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:26,191 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:26,216 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:26,436 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:26,451 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:26,466 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:26,685 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:26,686 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 16:18:26,697 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:26,918 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:26,931 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 16:18:26,944 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 16:18:27,167 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:27,184 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:27,409 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:27,429 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:27,451 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:27,674 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:18:27,902 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:18:27,918 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:27,934 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:18:28,223 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 16:18:28,449 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:18:28,673 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-02-02 16:18:28,954 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/xet-read-token/5617a9f61b028005a4858fdac845db406aefb181 "HTTP/1.1 200 OK"
+2026-02-02 16:19:54,149 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 16:19:54,514 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:19:54,843 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/main "HTTP/1.1 200 OK"
+2026-02-02 16:19:55,122 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/discussions?p=0 "HTTP/1.1 200 OK"
+2026-02-02 16:19:55,432 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/refs%2Fpr%2F130 "HTTP/1.1 200 OK"
+2026-02-02 16:19:55,668 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:19:55,903 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 16:19:56,160 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/xet-read-token/9a0624b896d81da7492a910ffa53731274b6cf3d "HTTP/1.1 200 OK"
+2026-02-02 16:20:00,704 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:20:00,952 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:20:01,463 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:20:01,785 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:20:02,006 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:20:02,608 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 16:20:03,134 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 16:20:03,465 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentencepiece.bpe.model "HTTP/1.1 302 Found"
+2026-02-02 16:20:15,964 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-02 16:20:30,525 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/added_tokens.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:20:30,839 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/special_tokens_map.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:20:30,969 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-02-02 16:20:31,095 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/special_tokens_map.json "HTTP/1.1 200 OK"
+2026-02-02 16:20:31,470 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/chat_template.jinja "HTTP/1.1 404 Not Found"
+2026-02-02 16:21:18,680 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:21:19,041 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:21:19,124 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 16:21:19,221 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 16:21:19,574 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:21:19,811 [INFO] src.embedding - Model loaded.
+2026-02-02 16:23:00,025 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 16:23:00,031 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 16:23:00,052 [INFO] __main__ - ✅ END: Create embeddings | 274.28s
+2026-02-02 16:23:00,054 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 16:23:00,084 [ERROR] __main__ - ❌ FAIL: Init vector store | 0.03s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 311, in ingest
+    store = PgVectorStore(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 28, in __init__
+    self._ensure_schema()
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 31, in _ensure_schema
+    conn = psycopg2.connect(self.dsn)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "localhost" (127.0.0.1), port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2026-02-02 16:24:16,072 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 16:24:16,073 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 16:24:16,084 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 16:24:16,084 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-02 16:24:16,084 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-02 16:24:16,084 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 16:24:24,847 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.21s
+2026-02-02 16:24:24,853 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 16:24:24,878 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-02 16:24:24,878 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 16:24:24,879 [INFO] __main__ - ✅ END: Load Excel data | 8.80s
+2026-02-02 16:24:24,879 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 16:24:24,880 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 16:24:24,882 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 16:24:24,882 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 16:24:24,882 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-02 16:24:24,918 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 16:24:24,918 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 16:24:24,919 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 16:24:24,919 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 16:24:24,919 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-02 16:24:24,920 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-02 16:24:24,920 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-02 16:24:24,920 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 16:24:24,920 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-02 16:24:24,924 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 16:24:24,924 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-02 16:24:25,253 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:25,268 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:25,504 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:25,521 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:25,752 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:25,763 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:25,984 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:25,996 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 16:24:26,217 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:26,232 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:26,469 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:26,485 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:26,709 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:24:26,946 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:26,958 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:27,237 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 16:24:27,469 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:24:27,764 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/main "HTTP/1.1 200 OK"
+2026-02-02 16:24:28,018 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/discussions?p=0 "HTTP/1.1 200 OK"
+2026-02-02 16:24:28,270 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:28,287 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:28,314 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/refs%2Fpr%2F130 "HTTP/1.1 200 OK"
+2026-02-02 16:24:28,514 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:28,533 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:28,551 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:24:28,775 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 16:24:28,784 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 16:24:29,042 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 16:24:32,257 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:24:32,516 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:24:32,521 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 16:24:32,538 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 16:24:32,761 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:24:32,775 [INFO] src.embedding - Model loaded.
+2026-02-02 16:25:56,104 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 16:25:56,107 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 16:25:56,119 [INFO] __main__ - ✅ END: Create embeddings | 91.20s
+2026-02-02 16:25:56,119 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 16:25:56,263 [ERROR] __main__ - ❌ FAIL: Init vector store | 0.14s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 311, in ingest
+    store = PgVectorStore(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 28, in __init__
+    self._ensure_schema()
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 31, in _ensure_schema
+    conn = psycopg2.connect(self.dsn)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/psycopg2/__init__.py", line 122, in connect
+    conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+psycopg2.OperationalError: connection to server at "localhost" (127.0.0.1), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+connection to server at "localhost" (127.0.0.1), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+
+2026-02-02 16:26:59,403 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 16:26:59,404 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 16:26:59,411 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 16:26:59,412 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-02 16:26:59,412 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-02 16:26:59,413 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 16:27:08,315 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.29s
+2026-02-02 16:27:08,318 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 16:27:08,340 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-02 16:27:08,341 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 16:27:08,341 [INFO] __main__ - ✅ END: Load Excel data | 8.93s
+2026-02-02 16:27:08,341 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 16:27:08,342 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 16:27:08,344 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 16:27:08,344 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 16:27:08,345 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-02 16:27:08,380 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 16:27:08,381 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 16:27:08,381 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 16:27:08,381 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 16:27:08,381 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-02 16:27:08,381 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-02 16:27:08,381 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-02 16:27:08,382 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 16:27:08,382 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-02 16:27:08,384 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 16:27:08,385 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-02 16:27:08,714 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:08,733 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:08,967 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:08,985 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:09,211 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:09,213 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 16:27:09,228 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:09,456 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:09,470 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 16:27:09,698 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:09,713 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:09,943 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:09,955 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:10,180 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:27:10,406 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:10,424 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:10,741 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 16:27:10,983 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:27:11,240 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/main "HTTP/1.1 200 OK"
+2026-02-02 16:27:11,502 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/discussions?p=0 "HTTP/1.1 200 OK"
+2026-02-02 16:27:11,778 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:11,790 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:11,791 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/refs%2Fpr%2F130 "HTTP/1.1 200 OK"
+2026-02-02 16:27:12,015 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:12,020 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:27:12,028 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:12,244 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 16:27:12,259 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 16:27:12,487 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 16:27:15,572 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:27:15,912 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:27:15,924 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 16:27:16,161 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:27:16,193 [INFO] src.embedding - Model loaded.
+2026-02-02 16:28:39,102 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 16:28:39,104 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 16:28:39,116 [INFO] __main__ - ✅ END: Create embeddings | 90.73s
+2026-02-02 16:28:39,116 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 16:28:39,228 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-02 16:28:39,248 [INFO] __main__ - ✅ END: Init vector store | 0.13s
+2026-02-02 16:28:39,249 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-02 16:28:39,249 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-02 16:28:39,257 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-02 16:28:39,697 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.45s
+2026-02-02 16:28:39,698 [INFO] __main__ - Ingestion completed successfully.
+2026-02-02 16:53:28,795 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 16:53:28,796 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 16:53:28,805 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 16:53:28,806 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-02 16:53:28,807 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-02 16:53:28,807 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 16:53:37,287 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.06s
+2026-02-02 16:53:37,292 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 16:53:37,313 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-02 16:53:37,314 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 16:53:37,315 [INFO] __main__ - ✅ END: Load Excel data | 8.51s
+2026-02-02 16:53:37,315 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 16:53:37,315 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 16:53:37,317 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 16:53:37,317 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 16:53:37,318 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-02 16:53:37,349 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 16:53:37,350 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 16:53:37,350 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 16:53:37,350 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 16:53:37,350 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-02 16:53:37,351 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-02 16:53:37,351 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-02 16:53:37,351 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 16:53:37,351 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-02 16:53:37,353 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 16:53:37,353 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-02 16:53:37,667 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:37,678 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:37,901 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:37,903 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 16:53:37,920 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:38,150 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:38,165 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:38,388 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:38,400 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 16:53:38,626 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:38,639 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:38,867 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:38,884 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:39,109 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:53:39,333 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:39,350 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:39,635 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 16:53:39,860 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:53:40,129 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/main "HTTP/1.1 200 OK"
+2026-02-02 16:53:40,385 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/discussions?p=0 "HTTP/1.1 200 OK"
+2026-02-02 16:53:40,654 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/refs%2Fpr%2F130 "HTTP/1.1 200 OK"
+2026-02-02 16:53:40,753 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:40,766 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:40,888 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 16:53:40,989 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:41,006 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:41,124 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 16:53:41,256 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 16:53:41,487 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 16:53:44,985 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:53:45,233 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 16:53:45,246 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 16:53:45,480 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 16:53:45,495 [INFO] src.embedding - Model loaded.
+2026-02-02 16:55:03,323 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 16:55:03,325 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 16:55:03,333 [INFO] __main__ - ✅ END: Create embeddings | 85.98s
+2026-02-02 16:55:03,333 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 16:55:03,447 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-02 16:55:03,459 [INFO] __main__ - ✅ END: Init vector store | 0.13s
+2026-02-02 16:55:03,462 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-02 16:55:03,462 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-02 16:55:03,469 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-02 16:55:03,876 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.41s
+2026-02-02 16:55:03,878 [INFO] __main__ - Ingestion completed successfully.
+2026-02-02 18:29:44,192 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 18:29:44,192 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 18:29:44,205 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 18:29:44,206 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-02 18:29:44,206 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-02 18:29:44,206 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 18:29:55,448 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=5.83s
+2026-02-02 18:29:55,452 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 18:29:55,477 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.03s
+2026-02-02 18:29:55,478 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-02 18:29:55,479 [INFO] __main__ - ✅ END: Load Excel data | 11.27s
+2026-02-02 18:29:55,479 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 18:29:55,479 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 18:29:55,481 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 18:29:55,482 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 18:29:55,484 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-02 18:29:55,521 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 18:29:55,522 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 18:29:55,522 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 18:29:55,523 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 18:29:55,524 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-02 18:29:55,525 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-02 18:29:55,526 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-02 18:29:55,526 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 18:29:55,526 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-02 18:29:55,528 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 18:29:55,528 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-02 18:29:55,926 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:55,942 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:56,170 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:56,192 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:56,420 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:56,431 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:56,650 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:56,666 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 18:29:56,891 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:56,893 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-02 18:29:56,907 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:57,135 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:57,149 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:57,410 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 18:29:57,680 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:57,699 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:57,995 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 18:29:58,229 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 18:29:58,489 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/main "HTTP/1.1 200 OK"
+2026-02-02 18:29:58,757 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/discussions?p=0 "HTTP/1.1 200 OK"
+2026-02-02 18:29:59,027 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/refs%2Fpr%2F130 "HTTP/1.1 200 OK"
+2026-02-02 18:29:59,085 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:59,096 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:59,252 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 18:29:59,316 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:29:59,327 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 18:29:59,470 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 18:29:59,562 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 18:29:59,781 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 18:30:03,745 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 18:30:03,984 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:30:03,998 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 18:30:04,231 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 18:30:04,247 [INFO] src.embedding - Model loaded.
+2026-02-02 18:31:33,780 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 18:31:33,782 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 18:31:33,794 [INFO] __main__ - ✅ END: Create embeddings | 98.27s
+2026-02-02 18:31:33,795 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 18:31:33,904 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-02 18:31:33,916 [INFO] __main__ - ✅ END: Init vector store | 0.12s
+2026-02-02 18:31:33,917 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-02 18:31:33,918 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-02 18:31:33,928 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-02 18:31:34,382 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.46s
+2026-02-02 18:31:34,384 [INFO] __main__ - Ingestion completed successfully.
+2026-02-02 18:52:19,670 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-02 18:52:19,670 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-02 18:52:19,679 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-02 18:52:19,679 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-02 18:52:19,679 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-02 18:52:19,680 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 18:52:28,799 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.44s
+2026-02-02 18:52:28,803 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 18:52:28,805 [WARNING] __main__ - Structured loader failed; falling back to simple loader. Error=format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 145, in ingest
+    texts, payloads = load_structured_data_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 220, in load_structured_data_from_excel
+    payload = format_row_to_db_columns(
+TypeError: format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+2026-02-02 18:52:28,806 [INFO] src.data_loader - load_texts_from_excel(): sheet=sample expected_columns=['Message']
+2026-02-02 18:52:28,806 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-02 18:52:37,094 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.23s
+2026-02-02 18:52:37,094 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-02 18:52:37,096 [INFO] src.data_loader - Loaded 94 text entries from Excel in 0.00s
+2026-02-02 18:52:37,096 [INFO] __main__ - Loaded plain texts: 94
+2026-02-02 18:52:37,098 [INFO] __main__ - Created fallback payloads: 94
+2026-02-02 18:52:37,099 [INFO] __main__ - ✅ END: Load Excel data | 17.42s
+2026-02-02 18:52:37,100 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-02 18:52:37,100 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-02 18:52:37,104 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-02 18:52:37,104 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-02 18:52:37,105 [INFO] __main__ - ✅ END: Chunk texts | 0.01s
+2026-02-02 18:52:37,173 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-02 18:52:37,173 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-02 18:52:37,174 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-02 18:52:37,174 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-02 18:52:37,174 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-02 18:52:37,174 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-02 18:52:37,175 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-02 18:52:37,175 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-02 18:52:37,175 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-02 18:52:37,181 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-02 18:52:37,189 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-02 18:52:37,565 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:37,579 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:37,805 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:37,826 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:38,058 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config_sentence_transformers.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:38,077 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config_sentence_transformers.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:38,326 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:38,341 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/README.md "HTTP/1.1 200 OK"
+2026-02-02 18:52:38,564 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/modules.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:38,574 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/modules.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:38,805 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/sentence_bert_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:38,816 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/sentence_bert_config.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:39,045 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/adapter_config.json "HTTP/1.1 404 Not Found"
+2026-02-02 18:52:39,271 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:39,284 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:39,559 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-02 18:52:39,801 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 18:52:40,054 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/main "HTTP/1.1 200 OK"
+2026-02-02 18:52:40,327 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/discussions?p=0 "HTTP/1.1 200 OK"
+2026-02-02 18:52:40,587 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/commits/refs%2Fpr%2F130 "HTTP/1.1 200 OK"
+2026-02-02 18:52:40,591 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:40,604 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/config.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:40,810 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+2026-02-02 18:52:40,826 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/tokenizer_config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:40,839 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/tokenizer_config.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:41,034 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/refs%2Fpr%2F130/model.safetensors "HTTP/1.1 302 Found"
+2026-02-02 18:52:41,068 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main/additional_chat_templates?recursive=false&expand=false "HTTP/1.1 404 Not Found"
+2026-02-02 18:52:41,297 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3/tree/main?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-02-02 18:52:44,439 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 18:52:44,689 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/1_Pooling/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-02 18:52:44,702 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/BAAI/bge-m3/5617a9f61b028005a4858fdac845db406aefb181/1_Pooling%2Fconfig.json "HTTP/1.1 200 OK"
+2026-02-02 18:52:44,931 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/BAAI/bge-m3 "HTTP/1.1 200 OK"
+2026-02-02 18:52:44,952 [INFO] src.embedding - Model loaded.
+2026-02-02 18:54:04,352 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-02 18:54:04,355 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-02 18:54:04,368 [INFO] __main__ - ✅ END: Create embeddings | 87.19s
+2026-02-02 18:54:04,368 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-02 18:54:04,474 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-02 18:54:04,486 [INFO] __main__ - ✅ END: Init vector store | 0.12s
+2026-02-02 18:54:04,487 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-02 18:54:04,488 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-02 18:54:04,499 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-02 18:54:04,916 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.43s
+2026-02-02 18:54:04,917 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 12:03:23,125 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 12:03:23,126 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 12:03:23,134 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 12:03:23,134 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 12:03:23,135 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 12:03:23,135 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:03:31,977 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.23s
+2026-02-09 12:03:31,984 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:03:31,985 [WARNING] __main__ - Structured loader failed; falling back to simple loader. Error=format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 145, in ingest
+    texts, payloads = load_structured_data_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 220, in load_structured_data_from_excel
+    payload = format_row_to_db_columns(
+TypeError: format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+2026-02-09 12:03:31,987 [INFO] src.data_loader - load_texts_from_excel(): sheet=sample expected_columns=['Message']
+2026-02-09 12:03:31,987 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:03:39,244 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=3.65s
+2026-02-09 12:03:39,244 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:03:39,245 [INFO] src.data_loader - Loaded 94 text entries from Excel in 0.00s
+2026-02-09 12:03:39,245 [INFO] __main__ - Loaded plain texts: 94
+2026-02-09 12:03:39,246 [INFO] __main__ - Created fallback payloads: 94
+2026-02-09 12:03:39,247 [INFO] __main__ - ✅ END: Load Excel data | 16.11s
+2026-02-09 12:03:39,247 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 12:03:39,247 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 12:03:39,250 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 12:03:39,250 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 12:03:39,252 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-09 12:03:39,263 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 12:03:39,263 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 12:03:39,263 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 12:03:39,264 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 12:03:39,264 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 12:03:39,264 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 12:03:39,264 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 12:03:39,264 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 12:03:39,265 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 12:03:39,271 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 12:03:39,272 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 12:03:53,195 [INFO] src.embedding - Model loaded.
+2026-02-09 12:05:30,287 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 12:05:30,292 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 12:05:30,301 [INFO] __main__ - ✅ END: Create embeddings | 111.04s
+2026-02-09 12:05:30,302 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 12:05:30,398 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 12:05:30,416 [INFO] __main__ - ✅ END: Init vector store | 0.11s
+2026-02-09 12:05:30,417 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 12:05:30,418 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 12:05:30,429 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 12:05:30,924 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.51s
+2026-02-09 12:05:30,925 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 12:14:50,362 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 12:14:50,363 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 12:14:50,373 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 12:14:50,373 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 12:14:50,373 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 12:14:50,373 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:14:58,592 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.17s
+2026-02-09 12:14:58,595 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:14:58,596 [WARNING] __main__ - Structured loader failed; falling back to simple loader. Error=format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 145, in ingest
+    texts, payloads = load_structured_data_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 220, in load_structured_data_from_excel
+    payload = format_row_to_db_columns(
+TypeError: format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+2026-02-09 12:14:58,598 [INFO] src.data_loader - load_texts_from_excel(): sheet=sample expected_columns=['Message']
+2026-02-09 12:14:58,599 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:15:06,724 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.08s
+2026-02-09 12:15:06,724 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:15:06,726 [INFO] src.data_loader - Loaded 94 text entries from Excel in 0.00s
+2026-02-09 12:15:06,726 [INFO] __main__ - Loaded plain texts: 94
+2026-02-09 12:15:06,727 [INFO] __main__ - Created fallback payloads: 94
+2026-02-09 12:15:06,728 [INFO] __main__ - ✅ END: Load Excel data | 16.35s
+2026-02-09 12:15:06,728 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 12:15:06,728 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 12:15:06,734 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 12:15:06,735 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 12:15:06,736 [INFO] __main__ - ✅ END: Chunk texts | 0.01s
+2026-02-09 12:15:06,750 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 12:15:06,751 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 12:15:06,751 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 12:15:06,752 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 12:15:06,753 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 12:15:06,754 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 12:15:06,754 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 12:15:06,755 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 12:15:06,756 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 12:15:06,760 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 12:15:06,761 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 12:15:14,662 [INFO] src.embedding - Model loaded.
+2026-02-09 12:16:39,455 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 12:16:39,459 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 12:16:39,469 [INFO] __main__ - ✅ END: Create embeddings | 92.71s
+2026-02-09 12:16:39,469 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 12:16:39,577 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 12:16:39,589 [INFO] __main__ - ✅ END: Init vector store | 0.12s
+2026-02-09 12:16:39,590 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 12:16:39,590 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 12:16:39,601 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 12:16:40,101 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.51s
+2026-02-09 12:16:40,102 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 12:27:59,860 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 12:27:59,861 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 12:27:59,871 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 12:27:59,871 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 12:27:59,871 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 12:27:59,871 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:28:08,387 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.16s
+2026-02-09 12:28:08,394 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:28:08,396 [WARNING] __main__ - Structured loader failed; falling back to simple loader. Error=format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 145, in ingest
+    texts, payloads = load_structured_data_from_excel(
+  File "/home/prashant/sma_ingestion_pipeline/src/data_loader.py", line 220, in load_structured_data_from_excel
+    payload = format_row_to_db_columns(
+TypeError: format_row_to_db_columns() got an unexpected keyword argument 'column_mapping'
+2026-02-09 12:28:08,397 [INFO] src.data_loader - load_texts_from_excel(): sheet=sample expected_columns=['Message']
+2026-02-09 12:28:08,397 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:28:16,534 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.06s
+2026-02-09 12:28:16,535 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:28:16,537 [INFO] src.data_loader - Loaded 94 text entries from Excel in 0.00s
+2026-02-09 12:28:16,537 [INFO] __main__ - Loaded plain texts: 94
+2026-02-09 12:28:16,538 [INFO] __main__ - Created fallback payloads: 94
+2026-02-09 12:28:16,539 [INFO] __main__ - ✅ END: Load Excel data | 16.67s
+2026-02-09 12:28:16,539 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 12:28:16,539 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 12:28:16,543 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 12:28:16,543 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 12:28:16,545 [INFO] __main__ - ✅ END: Chunk texts | 0.01s
+2026-02-09 12:28:16,559 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 12:28:16,560 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 12:28:16,560 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 12:28:16,561 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 12:28:16,562 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 12:28:16,562 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 12:28:16,562 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 12:28:16,562 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 12:28:16,563 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 12:28:16,566 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 12:28:16,567 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 12:29:08,796 [INFO] src.embedding - Model loaded.
+2026-02-09 12:30:46,442 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 12:30:46,446 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 12:30:46,453 [INFO] __main__ - ✅ END: Create embeddings | 149.89s
+2026-02-09 12:30:46,454 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 12:30:46,595 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 12:30:46,612 [INFO] __main__ - ✅ END: Init vector store | 0.16s
+2026-02-09 12:30:46,613 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 12:30:46,613 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 12:30:46,627 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 12:30:47,185 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.57s
+2026-02-09 12:30:47,187 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 12:36:01,561 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 12:36:01,561 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 12:36:01,570 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 12:36:01,571 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 12:36:01,572 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 12:36:01,572 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:36:10,559 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.40s
+2026-02-09 12:36:10,563 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:36:10,585 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-09 12:36:10,585 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 12:36:10,586 [INFO] __main__ - ✅ END: Load Excel data | 9.01s
+2026-02-09 12:36:10,586 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 12:36:10,586 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 12:36:10,588 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 12:36:10,589 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 12:36:10,589 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-09 12:36:10,603 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 12:36:10,603 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 12:36:10,604 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 12:36:10,604 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 12:36:10,604 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 12:36:10,604 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 12:36:10,604 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 12:36:10,604 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 12:36:10,605 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 12:36:10,609 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 12:36:10,610 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 12:36:19,023 [INFO] src.embedding - Model loaded.
+2026-02-09 12:37:35,678 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 12:37:35,681 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 12:37:35,691 [INFO] __main__ - ✅ END: Create embeddings | 85.09s
+2026-02-09 12:37:35,692 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 12:37:35,822 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 12:37:35,831 [INFO] __main__ - ✅ END: Init vector store | 0.14s
+2026-02-09 12:37:35,833 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 12:37:35,834 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 12:37:35,844 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 12:37:36,315 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.48s
+2026-02-09 12:37:36,317 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 12:52:01,022 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 12:52:01,023 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 12:52:01,030 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 12:52:01,031 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 12:52:01,032 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 12:52:01,032 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:52:09,889 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.33s
+2026-02-09 12:52:09,897 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:52:09,915 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-09 12:52:09,915 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 12:52:09,916 [INFO] __main__ - ✅ END: Load Excel data | 8.88s
+2026-02-09 12:52:09,916 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 12:52:09,916 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 12:52:09,919 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 12:52:09,919 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 12:52:09,919 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-09 12:52:09,933 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 12:52:09,933 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 12:52:09,933 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 12:52:09,934 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 12:52:09,934 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 12:52:09,934 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 12:52:09,934 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 12:52:09,934 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 12:52:09,934 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 12:52:09,941 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 12:52:09,941 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 12:52:40,919 [INFO] src.embedding - Model loaded.
+2026-02-09 12:54:19,818 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 12:54:19,820 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 12:54:19,830 [INFO] __main__ - ✅ END: Create embeddings | 129.90s
+2026-02-09 12:54:19,831 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 12:54:20,048 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 12:54:20,064 [INFO] __main__ - ✅ END: Init vector store | 0.23s
+2026-02-09 12:54:20,066 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 12:54:20,066 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 12:54:20,080 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 12:54:20,592 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.53s
+2026-02-09 12:54:20,593 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 12:59:09,892 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 12:59:09,893 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 12:59:09,903 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 12:59:09,903 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 12:59:09,903 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 12:59:09,903 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 12:59:18,807 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=4.27s
+2026-02-09 12:59:18,812 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 12:59:18,831 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-09 12:59:18,832 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 12:59:18,832 [INFO] __main__ - ✅ END: Load Excel data | 8.93s
+2026-02-09 12:59:18,833 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 12:59:18,833 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 12:59:18,835 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 12:59:18,835 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 12:59:18,836 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-09 12:59:18,848 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 12:59:18,849 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 12:59:18,849 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 12:59:18,849 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 12:59:18,849 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 12:59:18,849 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 12:59:18,849 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 12:59:18,849 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 12:59:18,849 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 12:59:18,855 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 12:59:18,855 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 12:59:27,348 [INFO] src.embedding - Model loaded.
+2026-02-09 13:01:39,735 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 13:01:39,737 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 13:01:39,760 [INFO] __main__ - ✅ END: Create embeddings | 140.91s
+2026-02-09 13:01:39,760 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 13:01:39,863 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 13:01:39,875 [INFO] __main__ - ✅ END: Init vector store | 0.11s
+2026-02-09 13:01:39,878 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 13:01:39,879 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 13:01:39,897 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 13:01:40,483 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.60s
+2026-02-09 13:01:40,485 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 13:11:46,943 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 13:11:46,943 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 13:11:46,955 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 13:11:46,956 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 13:11:46,956 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 13:11:46,957 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 13:11:54,602 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=3.71s
+2026-02-09 13:11:54,610 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 13:11:54,632 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.02s
+2026-02-09 13:11:54,632 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 13:11:54,633 [INFO] __main__ - ✅ END: Load Excel data | 7.68s
+2026-02-09 13:11:54,633 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 13:11:54,633 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 13:11:54,636 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 13:11:54,636 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 13:11:54,637 [INFO] __main__ - ✅ END: Chunk texts | 0.00s
+2026-02-09 13:11:54,652 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 13:11:54,652 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 13:11:54,652 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 13:11:54,652 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 13:11:54,653 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 13:11:54,653 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 13:11:54,653 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 13:11:54,653 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 13:11:54,653 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 13:11:54,659 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 13:11:54,659 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 13:12:03,135 [INFO] src.embedding - Model loaded.
+2026-02-09 13:14:10,202 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 13:14:10,205 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 13:14:10,214 [INFO] __main__ - ✅ END: Create embeddings | 135.56s
+2026-02-09 13:14:10,216 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 13:14:10,340 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 13:14:10,365 [INFO] __main__ - ✅ END: Init vector store | 0.15s
+2026-02-09 13:14:10,367 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 13:14:10,368 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 13:14:10,387 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 13:14:11,678 [INFO] __main__ - ✅ END: Write embeddings to vector store | 1.31s
+2026-02-09 13:14:11,681 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 13:32:00,708 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 13:32:00,709 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 13:32:00,726 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 13:32:00,726 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 13:32:00,726 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 13:32:00,727 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 13:32:14,826 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=6.52s
+2026-02-09 13:32:14,835 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 13:32:14,886 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.05s
+2026-02-09 13:32:14,887 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 13:32:14,890 [INFO] __main__ - ✅ END: Load Excel data | 14.16s
+2026-02-09 13:32:14,891 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 13:32:14,891 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 13:32:14,903 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 13:32:14,905 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 13:32:14,908 [INFO] __main__ - ✅ END: Chunk texts | 0.02s
+2026-02-09 13:32:14,942 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 13:32:14,943 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 13:32:14,944 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 13:32:14,944 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 13:32:14,945 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 13:32:14,945 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 13:32:14,946 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 13:32:14,946 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 13:32:14,947 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 13:32:14,956 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 13:32:14,957 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 13:32:27,979 [INFO] src.embedding - Model loaded.

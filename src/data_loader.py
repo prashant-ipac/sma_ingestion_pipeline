@@ -224,6 +224,7 @@ def load_structured_data_from_excel(
                     row_number=int(idx) + 1,  # 1-indexed
                     embedding_model=embedding_model,
                     column_mapping=column_mapping,
+                    sheet_name=sheet_name,
                 )
                 texts.append(text)
                 payloads.append(payload)

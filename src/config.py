@@ -6,7 +6,7 @@ Values are primarily sourced from environment variables (.env supported).
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 import os
 from typing import List, Optional
 from urllib.parse import quote_plus
@@ -108,9 +108,9 @@ class Config:
     # pgvector backend
     # -----------------------
     pgvector_dsn: str = os.getenv(
-        "PGVECTOR_DSN", "postgresql://user:password@localhost:5432/social_vectors"
+        "PGVECTOR_DSN", "postgresql://postgres:1234@localhost:5432/sma-data"
     )
-    pgvector_table_name: str = os.getenv("PGVECTOR_TABLE_NAME", "embeddings")
+    pgvector_table_name: str = os.getenv("PGVECTOR_TABLE_NAME", "social_media_posts")
 
     # -----------------------
     # Milvus backend
@@ -146,6 +146,25 @@ class Config:
     text_columns: List[str] = field(
         default_factory=lambda: _get_env_list("TEXT_COLUMNS", DEFAULT_TEXT_COLUMNS)
     )
+
+    # -----------------------
+    # Text normalization / cleaning
+    # -----------------------
+
+    @dataclass
+    class NormalizationConfig:
+        lower: bool = True
+        unicode_nfkc: bool = True
+        collapse_ws: bool = True
+        strip_emails: bool = True
+        strip_urls: bool = True
+        strip_hashtags: bool = False
+        strip_mentions: bool = True
+        strip_html_like: bool = True
+        drop_digits: bool = False
+        emoji_policy: str = "demojize"
+
+    normalization: NormalizationConfig = field(default_factory=NormalizationConfig)
 
     def finalize(self) -> None:
         """
@@ -229,6 +248,7 @@ class Config:
             "log_level": self.log_level,
             "default_sheet_name": self.default_sheet_name,
             "text_columns": self.text_columns,
+            "normalization": asdict(self.normalization),
         }
 
 

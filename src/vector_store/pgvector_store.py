@@ -36,10 +36,32 @@ class PgVectorStore(VectorStore):
         cur.execute(
             f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
-                id UUID PRIMARY KEY,
-                text TEXT NOT NULL,
-                payload JSONB,
-                embedding vector({self.embedding_dim}) NOT NULL
+                id TEXT PRIMARY KEY,
+                platform TEXT NOT NULL,
+                platform_post_id TEXT,
+
+                state TEXT,
+                posted_date DATE,
+                username TEXT,
+                post_url TEXT,
+                video_id TEXT,
+                post_type_raw TEXT,
+                post_type_norm TEXT,
+
+                text TEXT,
+                engagement_total INTEGER,
+
+                embedding vector({self.embedding_dim}),
+                embedding_model TEXT,
+                embedding_provider TEXT,
+
+                extras JSONB DEFAULT '{{}}'::jsonb,
+                ingested_from TEXT DEFAULT 'excel',
+                source_file TEXT,
+                source_sheet TEXT,
+                source_row_number INTEGER,
+
+                created_at TIMESTAMPTZ DEFAULT now()
             );
             """
         )
@@ -55,44 +77,39 @@ class PgVectorStore(VectorStore):
         ids: Iterable[str] | None = None,
     ) -> None:
         """
-        Add embeddings to pgvector with structured payload format.
+        Add embeddings to pgvector, storing values directly in table columns.
 
         Args:
             embeddings: Numpy array of embeddings
             texts: Sequence of text strings
-            metadatas: Legacy metadata format (for backward compatibility)
-            payloads: New structured payload format (preferred)
-            ids: Optional list of UUID strings. If not provided, UUIDs will be generated.
+            metadatas: Optional metadata (legacy, unused if payloads provided)
+            payloads: Optional structured data with column mappings (used for DB column values)
+            ids: Optional list of IDs. If not provided, UUIDs will be generated.
         """
+        texts_list = list(texts)
+        embeddings_array = np.asarray(embeddings)
+        
+        if len(embeddings_array) != len(texts_list):
+            raise ValueError("Embeddings and texts must have the same length.")
+
+        # Use provided payloads or create empty defaults
         if payloads is None:
-            # Legacy mode: convert simple metadatas to payload format
-            if metadatas is None:
-                metadatas = [{} for _ in texts]
-            metadatas_list = list(metadatas)
-            payloads = [
-                create_payload(
-                    text=text,
-                    ingested_from=meta.get("source", "excel"),
-                    file_name=meta.get("file_name", ""),
-                    row_number=meta.get("index", meta.get("row_number", 0)),
-                )
-                for text, meta in zip(texts, metadatas_list)
-            ]
+            payloads = [{} for _ in texts_list]
         else:
             payloads = list(payloads)
 
-        if len(embeddings) != len(texts) or len(embeddings) != len(payloads):
-            raise ValueError("Embeddings, texts, and payloads must have the same length.")
+        if len(payloads) != len(texts_list):
+            raise ValueError("Payloads and texts must have the same length.")
 
-        # Generate UUIDs if not provided
+        # Generate IDs if not provided
         if ids is None:
-            ids = [str(uuid.uuid4()) for _ in texts]
+            ids = [str(uuid.uuid4()) for _ in texts_list]
         else:
             ids = list(ids)
 
         logger.info(
             "Inserting %d embeddings into table '%s' via pgvector",
-            len(embeddings),
+            len(texts_list),
             self.table_name,
         )
 
@@ -100,22 +117,76 @@ class PgVectorStore(VectorStore):
         cur = conn.cursor()
 
         records = []
-        for embedding, text, payload, entry_id in zip(embeddings, texts, payloads, ids):
+        for embedding, text, payload, entry_id in zip(embeddings_array, texts_list, payloads, ids):
+            # Convert embedding to list of native Python floats
             vec = np.asarray(embedding, dtype=float)
+            vec_list = [float(v) for v in vec]
+
+            # Extract values from payload dict, use defaults if not present
+            platform = payload.get("platform", "unknown") if isinstance(payload, dict) else "unknown"
+            platform_post_id = payload.get("platform_post_id") if isinstance(payload, dict) else None
+            state = payload.get("state") if isinstance(payload, dict) else None
+            posted_date = payload.get("posted_date") if isinstance(payload, dict) else None
+            username = payload.get("username") if isinstance(payload, dict) else None
+            post_url = payload.get("post_url") if isinstance(payload, dict) else None
+            video_id = payload.get("video_id") if isinstance(payload, dict) else None
+            post_type_raw = payload.get("post_type_raw") if isinstance(payload, dict) else None
+            post_type_norm = payload.get("post_type_norm") if isinstance(payload, dict) else None
+            engagement_total = payload.get("engagement_total") if isinstance(payload, dict) else None
+            embedding_model = payload.get("embedding_model") if isinstance(payload, dict) else None
+            embedding_provider = payload.get("embedding_provider") if isinstance(payload, dict) else None
+            extras = payload.get("extras", {}) if isinstance(payload, dict) else {}
+            ingested_from = payload.get("ingested_from", "excel") if isinstance(payload, dict) else "excel"
+            source_file = payload.get("source_file") if isinstance(payload, dict) else None
+            source_sheet = payload.get("source_sheet") if isinstance(payload, dict) else None
+            source_row_number = payload.get("source_row_number") if isinstance(payload, dict) else None
+            created_at = payload.get("created_at") if isinstance(payload, dict) else None
+
+            # Ensure proper types
+            engagement_total = int(engagement_total) if engagement_total is not None else None
+            source_row_number = int(source_row_number) if source_row_number is not None else None
+            
+            # Convert extras to JSON string if it's a dict
+            if isinstance(extras, dict):
+                extras_json = json.dumps(extras)
+            else:
+                extras_json = str(extras) if extras else '{}'
+
             records.append(
                 (
-                    entry_id,
-                    text,
-                    json.dumps(payload),
-                    list(vec),
+                    str(entry_id),
+                    str(platform) if platform else "unknown",
+                    str(platform_post_id) if platform_post_id else None,
+                    str(state) if state else None,
+                    str(posted_date) if posted_date else None,
+                    str(username) if username else None,
+                    str(post_url) if post_url else None,
+                    str(video_id) if video_id else None,
+                    str(post_type_raw) if post_type_raw else None,
+                    str(post_type_norm) if post_type_norm else None,
+                    str(text),
+                    engagement_total,
+                    vec_list,
+                    str(embedding_model) if embedding_model else None,
+                    str(embedding_provider) if embedding_provider else None,
+                    extras_json,
+                    str(ingested_from) if ingested_from else "excel",
+                    str(source_file) if source_file else None,
+                    str(source_sheet) if source_sheet else None,
+                    source_row_number,
+                    str(created_at) if created_at else None,
                 )
             )
 
-        execute_values(
-            cur,
-            f"INSERT INTO {self.table_name} (id, text, payload, embedding) VALUES %s",
-            records,
-        )
+        query = f"""
+            INSERT INTO {self.table_name} (
+                id, platform, platform_post_id, state, posted_date, username,
+                post_url, video_id, post_type_raw, post_type_norm, text, engagement_total,
+                embedding, embedding_model, embedding_provider, extras, ingested_from,
+                source_file, source_sheet, source_row_number, created_at
+            ) VALUES %s
+        """
+        execute_values(cur, query, records)
 
         conn.commit()
         cur.close()

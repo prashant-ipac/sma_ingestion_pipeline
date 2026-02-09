@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Mapping, Optional
 from .logging_utils import get_logger
 
 logger = get_logger(__name__)
+import json
+import uuid
 
 # Log only a few sample payloads (to avoid flooding logs)
 # Set in env: LOG_SAMPLE_ROWS=5
@@ -110,6 +112,12 @@ def create_payload(
     language: Optional[str] = None,
     hashtags: Optional[List[str]] = None,
     mentions: Optional[List[str]] = None,
+    state: Optional[str] = None,
+    posted_date: Optional[str] = None,
+    username: Optional[str] = None,
+    post_url: Optional[str] = None,
+    post_type: Optional[str] = None,
+    engagement_total: Optional[str] = None,
     urls: Optional[List[str]] = None,
     media_type: str = "text",
     media_urls: Optional[List[str]] = None,
@@ -136,6 +144,12 @@ def create_payload(
         "platform_post_id": platform_post_id or "",
         "author_id": author_id or "",
         "author_name": author_name or "",
+        "state": state or "",
+        "posted_date": posted_date or "",
+        "username": username or "",
+        "post_url": post_url or "",
+        "post_type": post_type or "",
+        "engagement_total": engagement_total or "",
         "content": {
             "text": text,
             "language": language or "en",
@@ -192,6 +206,7 @@ def format_from_excel_row(
     row_number: int,
     embedding_model: Optional[str] = None,
     column_mapping: Optional[Dict[str, str]] = None,
+    sheet_name: str = "",
 ) -> Dict[str, Any]:
     """
     Format a single Excel row into the vector store payload format.
@@ -222,12 +237,22 @@ def format_from_excel_row(
         text = ""
 
     # Extract structured fields
-    platform = get_value("platform") or get_value("Platform")
-    platform_post_id = get_value("platform_post_id") or get_value("post_id") or get_value("id")
+    platform = sheet_name
+
+    post_link = get_value("post_url") or get_value("Post URL") or get_value("Post Link") or get_value("post_link")
+    if post_link:
+        post_id = post_link.rstrip("/").split("/")[-1]
+    else:
+        post_id = "None"
+    platform_post_id = post_id
+    state = get_value("state") or get_value("State")
+    posted_date = get_value("posted_date") or get_value("Posted Date") or get_value("Date") or get_value("date")
+    username = get_value("username") or get_value("Username") or get_value("Author") or get_value("author") 
     author_id = get_value("author_id") or get_value("Author ID")
     author_name = get_value("author_name") or get_value("Author") or get_value("author")
     language = get_value("language") or get_value("Language")
-
+    post_type = get_value("post_type") or get_value("Post Type") or get_value("Post Type Raw") or get_value("Post Type Norm")
+    engagement_total = get_value("engagement_total") or get_value("Engagement")
     # Lists
     hashtags = _parse_csv_list(get_value("hashtags") or get_value("Hashtags"))
     mentions = _parse_csv_list(get_value("mentions") or get_value("Mentions"))
@@ -258,7 +283,13 @@ def format_from_excel_row(
         language=str(language) if language else None,
         hashtags=hashtags,
         mentions=mentions,
+        state=str(state) if state else None,
+        posted_date=str(posted_date) if posted_date else None,
+        username=str(username) if username else None,
+        post_url=str(post_link) if post_link else None,
         urls=urls,
+        post_type=str(post_type) if post_type else None,
+        engagement_total=str(engagement_total) if engagement_total else None,
         media_type=str(media_type),
         media_urls=media_urls,
         thumbnail_url=get_value("thumbnail_url") or get_value("Thumbnail URL"),
@@ -290,3 +321,163 @@ def format_from_excel_row(
         )
 
     return payload
+
+
+def format_row_to_db_columns(
+    row: Mapping[str, Any],
+    text_column: str,
+    file_name: str,
+    row_number: int,
+    embedding_model: Optional[str] = None,
+    embedding_provider: Optional[str] = None,
+    sheet_name: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Produce a flat mapping of database columns from an Excel row.
+
+    Extracts values from Excel row and maps to database columns:
+    - id, platform, platform_post_id, state, posted_date, username,
+      post_url, video_id, post_type_raw, post_type_norm, text,
+      engagement_total, embedding_model, embedding_provider, extras,
+      ingested_from, source_file, source_sheet, source_row_number, created_at
+    """
+    def get_value(key: str, default: Any = None) -> Any:
+        """Try to get value by exact key or common variations."""
+        if key in row:
+            val = row[key]
+            if _is_nan_like(val):
+                return default
+            return val
+        return default
+
+    # Extract text (required)
+    text = str(get_value(text_column, "") or "")
+
+    # Core platform fields
+    platform = get_value("platform") or get_value("Platform") or "unknown"
+    platform_post_id = (
+        get_value("platform_post_id") or 
+        get_value("post_id") or 
+        get_value("Post ID") or 
+        get_value("id") or 
+        ""
+    )
+
+    # State field
+    state = get_value("state") or get_value("State")
+
+    # Posted date
+    posted_date = (
+        get_value("posted_date") or 
+        get_value("Posted Date") or 
+        get_value("Date") or 
+        get_value("date")
+    )
+
+    # Username/Author
+    username = (
+        get_value("username") or 
+        get_value("Username") or 
+        get_value("Author") or 
+        get_value("author")
+    )
+
+    # Post URL
+    post_url = (
+        get_value("post_url") or 
+        get_value("Post URL") or 
+        get_value("Post Link") or 
+        get_value("post_link")
+    )
+
+    # Video ID
+    video_id = (
+        get_value("video_id") or 
+        get_value("Video ID") or 
+        get_value("Video id")
+    )
+
+    # Post type (raw and normalized)
+    post_type_raw = (
+        get_value("post_type_raw") or 
+        get_value("Post Type Raw") or 
+        get_value("Post Type") or 
+        get_value("post_type")
+    )
+    
+    post_type_norm = (
+        get_value("post_type_norm") or 
+        get_value("Post Type Norm") or 
+        get_value("post_type_normalized")
+    )
+
+    # Engagement total (single column or computed from likes/comments/shares)
+    engagement_total = get_value("engagement_total") or get_value("Engagement")
+    if engagement_total is None:
+        likes = _parse_int(
+            get_value("likes") or get_value("Likes"), 
+            "likes", 
+            row_number=row_number
+        ) or 0
+        comments = _parse_int(
+            get_value("comments") or get_value("Comments"), 
+            "comments", 
+            row_number=row_number
+        ) or 0
+        shares = _parse_int(
+            get_value("shares") or get_value("Shares") or get_value("Retweets"), 
+            "shares", 
+            row_number=row_number
+        ) or 0
+        engagement_total = likes + comments + shares
+
+    # Embedding info
+    embedding_model = embedding_model or get_value("embedding_model") or get_value("Embedding Model") or ""
+    embedding_provider = embedding_provider or get_value("embedding_provider") or get_value("Embedding Provider") or ""
+
+    # Extras (vendor-specific JSONB data)
+    extras = {}
+    extras_raw = get_value("extras") or get_value("Extras") or get_value("meta") or get_value("Meta")
+    if extras_raw and not _is_nan_like(extras_raw):
+        try:
+            if isinstance(extras_raw, str):
+                extras = json.loads(extras_raw)
+            elif isinstance(extras_raw, dict):
+                extras = extras_raw
+            else:
+                extras = {"extras": str(extras_raw)}
+        except Exception:
+            extras = {"extras": str(extras_raw)}
+
+    # Created at timestamp (use current time if not provided)
+    created_at = get_value("created_at") or get_value("Created At") or get_value("created_at")
+    if created_at is None or _is_nan_like(created_at):
+        created_at = datetime.utcnow().isoformat() + "Z"
+    else:
+        created_at = str(created_at)
+
+    # Build row map with all DB columns
+    row_map: Dict[str, Any] = {
+        "id": str(uuid.uuid4()),
+        "platform": str(platform) if platform is not None else "unknown",
+        "platform_post_id": str(platform_post_id) if platform_post_id is not None else "",
+        "state": str(state) if state is not None else None,
+        "posted_date": str(posted_date) if posted_date is not None else None,
+        "username": str(username) if username is not None else None,
+        "post_url": str(post_url) if post_url is not None else None,
+        "video_id": str(video_id) if video_id is not None else None,
+        "post_type_raw": str(post_type_raw) if post_type_raw is not None else None,
+        "post_type_norm": str(post_type_norm) if post_type_norm is not None else None,
+        "text": text,
+        "engagement_total": int(engagement_total) if engagement_total is not None else 0,
+        "embedding_model": str(embedding_model) if embedding_model else "",
+        "embedding_provider": str(embedding_provider) if embedding_provider else "",
+        "extras": extras,
+        "ingested_from": "excel",
+        "source_file": file_name,
+        "source_sheet": sheet_name or "",
+        "source_row_number": int(row_number),
+        "created_at": created_at,
+    }
+
+    return row_map

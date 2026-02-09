@@ -99,12 +99,13 @@
 
 
 """
-Embedding utilities wrapping VoyageAI with a compatible interface.
+Embedding utilities with support for multiple providers:
+- sentence_transformers (default)
+- voyage (VoyageAI API)
 """
 
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 import numpy as np
-import voyageai
 
 from .logging_utils import get_logger
 
@@ -121,7 +122,7 @@ def _safe_shape(arr) -> str:
 def _text_stats(texts: List[str]) -> Tuple[int, int, float]:
     """
     Returns (min_len, max_len, avg_len) in characters.
-    Useful to debug Voyage token limit errors & batching.
+    Useful to debug token limits & batching.
     """
     if not texts:
         return (0, 0, 0.0)
@@ -131,59 +132,191 @@ def _text_stats(texts: List[str]) -> Tuple[int, int, float]:
 
 class EmbeddingModel:
     """
-    Thin wrapper around VoyageAI embeddings.
+    Multi-provider embedding model wrapper.
 
     Supports:
-    - voyageai-3.5 embedding model
-    - Batch processing
-    - Drop-in replacement for sentence-transformers
+    - sentence_transformers (HuggingFace models with optional ONNX)
+    - voyage (VoyageAI API)
     """
 
     def __init__(
         self,
-        model_name: str = "voyageai-3.5",
+        model_name: str,
+        provider: str = "sentence_transformers",
         batch_size: int = 32,
-        api_key: str | None = None,
+        device: str | None = None,
+        use_onnx: bool = False,
+        # Voyage-specific parameters
+        voyage_api_key: str | None = None,
+        voyage_input_type: str | None = None,
+        voyage_truncation: bool | None = None,
+        voyage_output_dimension: int | None = None,
+        voyage_output_dtype: str = "float",
+        voyage_timeout: int | None = None,
+        voyage_max_retries: int = 2,
     ) -> None:
         """
-        Initialize VoyageAI embedding model.
+        Initialize embedding model.
 
         Args:
-            model_name: VoyageAI embedding model name
-            batch_size: Number of texts per API call
-            api_key: Optional API key (falls back to env var)
+            model_name: Model name (HuggingFace or VoyageAI)
+            provider: 'sentence_transformers' or 'voyage'
+            batch_size: Batch size for encoding
+            device: Device for sentence_transformers ('cpu', 'cuda', None)
+            use_onnx: Use ONNX Runtime for sentence_transformers
+            voyage_api_key: VoyageAI API key
+            voyage_input_type: VoyageAI input type ('query' or 'document')
+            voyage_truncation: VoyageAI truncation setting
+            voyage_output_dimension: VoyageAI output dimension
+            voyage_output_dtype: VoyageAI output dtype
+            voyage_timeout: VoyageAI timeout in seconds
+            voyage_max_retries: VoyageAI max retries
         """
         self.model_name = model_name
+        self.provider = provider
         self.batch_size = batch_size
+        self.device = device
+        self.use_onnx = use_onnx
+        self._model = None
+
+        if provider == "sentence_transformers":
+            self._init_sentence_transformers()
+        elif provider == "voyage":
+            self._init_voyage(
+                api_key=voyage_api_key,
+                input_type=voyage_input_type,
+                truncation=voyage_truncation,
+                output_dimension=voyage_output_dimension,
+                output_dtype=voyage_output_dtype,
+                timeout=voyage_timeout,
+                max_retries=voyage_max_retries,
+            )
+        else:
+            raise ValueError(f"Unsupported provider: {provider}")
+
+    def _init_sentence_transformers(self) -> None:
+        """Initialize sentence-transformers model."""
+        try:
+            from sentence_transformers import SentenceTransformer
+            self._st_model = None
+            logger.info(
+                "Initialized sentence_transformers (model=%s, device=%s, onnx=%s)",
+                self.model_name,
+                self.device,
+                self.use_onnx,
+            )
+        except ImportError:
+            raise ImportError("sentence-transformers not installed. Install with: pip install sentence-transformers")
+
+    def _init_voyage(
+        self,
+        api_key: str | None = None,
+        input_type: str | None = None,
+        truncation: bool | None = None,
+        output_dimension: int | None = None,
+        output_dtype: str = "float",
+        timeout: int | None = None,
+        max_retries: int = 2,
+    ) -> None:
+        """Initialize VoyageAI client."""
+        try:
+            import voyageai
+        except ImportError:
+            raise ImportError("voyageai not installed. Install with: pip install voyageai")
 
         if api_key:
             voyageai.api_key = api_key
 
-        self.client = voyageai.Client()
-
-        logger.info("Initialized VoyageAI embedding model: %s", self.model_name)
-
-    def encode(self, texts: Iterable[str]) -> np.ndarray:
-        texts_list: List[str] = list(texts)
+        self.voyage_client = voyageai.Client()
+        self.voyage_input_type = input_type
+        self.voyage_truncation = truncation
+        self.voyage_output_dimension = output_dimension
+        self.voyage_output_dtype = output_dtype
+        self.voyage_timeout = timeout
+        self.voyage_max_retries = max_retries
 
         logger.info(
-            "Encoding %d texts using VoyageAI (model=%s, batch_size=%d)",
-            len(texts_list),
+            "Initialized VoyageAI (model=%s, input_type=%s, output_dim=%s, dtype=%s)",
+            self.model_name,
+            input_type,
+            output_dimension,
+            output_dtype,
+        )
+
+    @property
+    def model(self):
+        """Lazy-load sentence-transformers model."""
+        if self._st_model is None:
+            from sentence_transformers import SentenceTransformer
+            logger.info("Loading sentence_transformers model '%s'...", self.model_name)
+            model_kwargs = {}
+            if self.device:
+                model_kwargs["device"] = self.device
+            self._st_model = SentenceTransformer(self.model_name, **model_kwargs)
+            logger.info("Model loaded.")
+        return self._st_model
+
+    def encode(self, texts: Iterable[str]) -> np.ndarray:
+        """Encode texts into embeddings."""
+        texts_list: List[str] = list(texts)
+
+        if self.provider == "sentence_transformers":
+            return self._encode_sentence_transformers(texts_list)
+        elif self.provider == "voyage":
+            return self._encode_voyage(texts_list)
+        else:
+            raise ValueError(f"Unsupported provider: {self.provider}")
+
+    def _encode_sentence_transformers(self, texts: List[str]) -> np.ndarray:
+        """Encode using sentence-transformers."""
+        logger.info(
+            "Encoding %d texts with sentence_transformers (batch_size=%d, onnx=%s)",
+            len(texts),
+            self.batch_size,
+            self.use_onnx,
+        )
+
+        embeddings = self.model.encode(
+            texts,
+            convert_to_numpy=True,
+            show_progress_bar=True,
+            batch_size=self.batch_size,
+        )
+
+        logger.info("Embeddings shape: %s", _safe_shape(embeddings))
+        return embeddings
+
+    def _encode_voyage(self, texts: List[str]) -> np.ndarray:
+        """Encode using VoyageAI."""
+        logger.info(
+            "Encoding %d texts with VoyageAI (model=%s, batch_size=%d)",
+            len(texts),
             self.model_name,
             self.batch_size,
         )
 
         all_embeddings: List[List[float]] = []
 
-        # Batch API calls for efficiency & cost control
-        for i in range(0, len(texts_list), self.batch_size):
-            batch = texts_list[i : i + self.batch_size]
+        # Batch API calls
+        for i in range(0, len(texts), self.batch_size):
+            batch = texts[i : i + self.batch_size]
 
-            response = self.client.embed(
-                texts=batch,
-                model=self.model_name,
-            )
+            embed_kwargs = {
+                "texts": batch,
+                "model": self.model_name,
+            }
+            if self.voyage_input_type:
+                embed_kwargs["input_type"] = self.voyage_input_type
+            if self.voyage_truncation is not None:
+                embed_kwargs["truncation"] = self.voyage_truncation
+            if self.voyage_output_dimension:
+                embed_kwargs["output_dimension"] = self.voyage_output_dimension
+            if self.voyage_output_dtype and self.voyage_output_dtype != "float":
+                embed_kwargs["output_dtype"] = self.voyage_output_dtype
 
+            response = self.voyage_client.embed(**embed_kwargs)
             all_embeddings.extend(response.embeddings)
 
-        return np.array(all_embeddings, dtype=np.float32)
+        result = np.array(all_embeddings, dtype=np.float32)
+        logger.info("Embeddings shape: %s", _safe_shape(result))
+        return result

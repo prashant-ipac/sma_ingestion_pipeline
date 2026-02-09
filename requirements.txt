@@ -14,7 +14,7 @@ rich
 pymongo[srv]==3.12
 voyageai 
 numpy
-
+emoji>=2.8.0
 
 # Optional: For faster inference (2-4x speedup)
 # onnxruntime  # Uncomment to enable ONNX Runtime support

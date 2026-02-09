@@ -26,6 +26,8 @@ from .vector_store import (
     MilvusVectorStore,
     AtlasVectorStore,
 )
+from dataclasses import asdict
+from .text_cleaner import TextCleaner, NormalizationConfig
 
 app = typer.Typer(help="Social media Excel → embeddings → vector store pipeline")
 console = Console()
@@ -191,6 +193,18 @@ def ingest(
         logger.info("Chunking output: chunks=%d (from texts=%d)", len(chunks), len(texts))
         console.print(f"[bold green]Chunked into {len(chunks)} chunks[/bold green]")
 
+    # ------------------------------------
+    # Optional: normalize/clean chunks prior to embedding
+    # ------------------------------------
+    try:
+        tcfg = NormalizationConfig(**asdict(cfg.normalization))
+        cleaner = TextCleaner(tcfg)
+        cleaned_chunks = cleaner.clean_many(chunks)
+        logger.info("Cleaned chunks: cleaned=%d original=%d", len(cleaned_chunks), len(chunks))
+        chunks = cleaned_chunks
+    except Exception:
+        logger.exception("Failed to clean chunks; proceeding with original chunks")
+
     if not chunks:
         console.print("[bold yellow]Chunking produced 0 chunks. Exiting.[/bold yellow]")
         logger.warning("Chunking produced 0 chunks. Check chunking strategy/settings.")
@@ -240,21 +254,30 @@ def ingest(
         getattr(cfg, "voyage_output_dtype", None),
     )
 
-    with log_step(logger, "Create embeddings", model=cfg.embedding_model, batch_size=cfg.embedding_batch_size):
-        model = EmbeddingModel(
-            model_name=cfg.embedding_model,
-            provider=cfg.embedding_provider,
-            batch_size=cfg.embedding_batch_size,
-            device=cfg.embedding_device,
-            use_onnx=cfg.embedding_use_onnx,
-            voyage_api_key=cfg.voyage_api_key,
-            voyage_input_type=cfg.voyage_input_type,
-            voyage_truncation=cfg.voyage_truncation,
-            voyage_output_dimension=cfg.voyage_output_dimension,
-            voyage_output_dtype=cfg.voyage_output_dtype,
-            voyage_timeout=cfg.voyage_timeout,
-            voyage_max_retries=cfg.voyage_max_retries,
-        )
+    with log_step(logger, "Create embeddings", provider=cfg.embedding_provider, model=cfg.embedding_model, batch_size=cfg.embedding_batch_size):
+        # Build provider-specific kwargs
+        kwargs = {
+            "model_name": cfg.embedding_model,
+            "provider": cfg.embedding_provider,
+            "batch_size": cfg.embedding_batch_size,
+        }
+        
+        # sentence_transformers parameters
+        if cfg.embedding_provider == "sentence_transformers":
+            kwargs["device"] = cfg.embedding_device
+            kwargs["use_onnx"] = cfg.embedding_use_onnx
+        
+        # Voyage parameters
+        elif cfg.embedding_provider == "voyage":
+            kwargs["voyage_api_key"] = cfg.voyage_api_key
+            kwargs["voyage_input_type"] = cfg.voyage_input_type
+            kwargs["voyage_truncation"] = cfg.voyage_truncation
+            kwargs["voyage_output_dimension"] = cfg.voyage_output_dimension
+            kwargs["voyage_output_dtype"] = cfg.voyage_output_dtype
+            kwargs["voyage_timeout"] = cfg.voyage_timeout
+            kwargs["voyage_max_retries"] = cfg.voyage_max_retries
+        
+        model = EmbeddingModel(**kwargs)
         embeddings = model.encode(chunks)
 
 

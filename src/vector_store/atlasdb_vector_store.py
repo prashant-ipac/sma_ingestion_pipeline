@@ -179,6 +179,7 @@ class AtlasVectorStore(VectorStore):
                     "embedding": np.asarray(embeddings[i], dtype=np.float32).tolist(),
                 }
             )
+        print("payloads", payloads[i])
         logger.info("Prepared %d documents in %.2fs", total, time.time() - t_build)
 
         # DEBUG: show one sample doc structure

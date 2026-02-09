@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -68,6 +69,12 @@ def parse_date(val) -> Optional[datetime.date]:
 
 def build_rows_from_sheet(df: pd.DataFrame, sheet: str, source_file: str, n: int):
     platform = normalize_platform(sheet)
+    
+    # Define expected columns that are explicitly extracted
+    expected_columns = {
+        "State", "Date", "Username", "Message", "text", "Post Link", 
+        "Video id", "Post Type", "Engagement"
+    }
 
     rows = []
     for i, r in df.iterrows():
@@ -104,6 +111,21 @@ def build_rows_from_sheet(df: pd.DataFrame, sheet: str, source_file: str, n: int
         # source_row_number:
         # pandas index 0 corresponds to excel row 2 (row 1 is header)
         source_row_number = int(i) + 2
+        
+        # Collect all columns not explicitly mapped into extras
+        extras_dict = {}
+        for col in df.columns:
+            if col not in expected_columns:
+                val = r.get(col)
+                # Only include non-null, non-nan values
+                if val is not None and not (isinstance(val, float) and str(val) == "nan"):
+                    # Convert pandas types to serializable types
+                    if hasattr(val, "to_pydatetime"):
+                        extras_dict[col] = val.to_pydatetime().isoformat()
+                    else:
+                        extras_dict[col] = str(val) if not isinstance(val, (str, int, float, bool)) else val
+        
+        extras_json = json.dumps(extras_dict)
 
         rows.append(
             (
@@ -122,7 +144,7 @@ def build_rows_from_sheet(df: pd.DataFrame, sheet: str, source_file: str, n: int
                 None,                   # embedding (NULL for dummy)
                 os.getenv("EMBEDDING_MODEL", None),          # embedding_model (optional)
                 os.getenv("EMBEDDING_PROVIDER", None),       # embedding_provider (optional)
-                "{}",                   # extras jsonb as text
+                extras_json,            # extras jsonb as text
                 "excel",                # ingested_from
                 source_file,            # source_file
                 sheet,                  # source_sheet
