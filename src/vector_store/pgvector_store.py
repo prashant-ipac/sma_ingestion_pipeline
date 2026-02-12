@@ -142,8 +142,16 @@ class PgVectorStore(VectorStore):
             source_row_number = payload.get("source_row_number") if isinstance(payload, dict) else None
             created_at = payload.get("created_at") if isinstance(payload, dict) else None
 
+
+            def safe_int(value):
+                try:
+                    return int(float(value))
+                except (TypeError, ValueError):
+                    return None
+
+# engagement_total = safe_int(engagement_total)
             # Ensure proper types
-            engagement_total = int(engagement_total) if engagement_total is not None else None
+            engagement_total = safe_int(engagement_total) if engagement_total is not None else None
             source_row_number = int(source_row_number) if source_row_number is not None else None
             
             # Convert extras to JSON string if it's a dict

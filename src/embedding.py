@@ -141,7 +141,7 @@ class EmbeddingModel:
 
     def __init__(
         self,
-        model_name: str,
+        model_name: str = "BAAI/bge-m3",
         provider: str = "sentence_transformers",
         batch_size: int = 32,
         device: str | None = None,
@@ -154,13 +154,16 @@ class EmbeddingModel:
         voyage_output_dtype: str = "float",
         voyage_timeout: int | None = None,
         voyage_max_retries: int = 2,
+        # Model2vec-specific parameters
+        model2vec_quantize: bool = False,
+        model2vec_enable_wasm: bool = False,
     ) -> None:
         """
         Initialize embedding model.
 
         Args:
             model_name: Model name (HuggingFace or VoyageAI)
-            provider: 'sentence_transformers' or 'voyage'
+            provider: 'sentence_transformers', 'voyage', or 'model2vec'
             batch_size: Batch size for encoding
             device: Device for sentence_transformers ('cpu', 'cuda', None)
             use_onnx: Use ONNX Runtime for sentence_transformers
@@ -171,6 +174,8 @@ class EmbeddingModel:
             voyage_output_dtype: VoyageAI output dtype
             voyage_timeout: VoyageAI timeout in seconds
             voyage_max_retries: VoyageAI max retries
+            model2vec_quantize: Enable quantization for model2vec
+            model2vec_enable_wasm: Enable WASM backend for model2vec
         """
         self.model_name = model_name
         self.provider = provider
@@ -190,6 +195,11 @@ class EmbeddingModel:
                 output_dtype=voyage_output_dtype,
                 timeout=voyage_timeout,
                 max_retries=voyage_max_retries,
+            )
+        elif provider == "model2vec":
+            self._init_model2vec(
+                quantize=model2vec_quantize,
+                enable_wasm=model2vec_enable_wasm,
             )
         else:
             raise ValueError(f"Unsupported provider: {provider}")
@@ -243,6 +253,28 @@ class EmbeddingModel:
             output_dtype,
         )
 
+    def _init_model2vec(
+        self,
+        quantize: bool = False,
+        enable_wasm: bool = False,
+    ) -> None:
+        """Initialize model2vec embedding model."""
+        try:
+            from model2vec import StaticModel
+        except ImportError:
+            raise ImportError("model2vec not installed. Install with: pip install model2vec")
+
+        self.model2vec_quantize = quantize
+        self.model2vec_enable_wasm = enable_wasm
+        self._m2v_model = None
+
+        logger.info(
+            "Initialized model2vec (model=%s, quantize=%s, enable_wasm=%s)",
+            self.model_name,
+            quantize,
+            enable_wasm,
+        )
+
     @property
     def model(self):
         """Lazy-load sentence-transformers model."""
@@ -256,6 +288,22 @@ class EmbeddingModel:
             logger.info("Model loaded.")
         return self._st_model
 
+    @property
+    def model2vec_model(self):
+        """Lazy-load model2vec model."""
+        if self._m2v_model is None:
+            from model2vec import StaticModel
+            import inspect
+            print(inspect.signature(StaticModel.from_pretrained))
+            logger.info("Loading model2vec model '%s'...", self.model_name)
+            self._m2v_model = StaticModel.from_pretrained(
+                self.model_name,
+                # quantize=self.model2vec_quantize,
+                # enable_wasm=self.model2vec_enable_wasm,
+            )
+            logger.info("Model loaded.")
+        return self._m2v_model
+
     def encode(self, texts: Iterable[str]) -> np.ndarray:
         """Encode texts into embeddings."""
         texts_list: List[str] = list(texts)
@@ -264,6 +312,8 @@ class EmbeddingModel:
             return self._encode_sentence_transformers(texts_list)
         elif self.provider == "voyage":
             return self._encode_voyage(texts_list)
+        elif self.provider == "model2vec":
+            return self._encode_model2vec(texts_list)
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
 
@@ -316,6 +366,33 @@ class EmbeddingModel:
 
             response = self.voyage_client.embed(**embed_kwargs)
             all_embeddings.extend(response.embeddings)
+
+        result = np.array(all_embeddings, dtype=np.float32)
+        logger.info("Embeddings shape: %s", _safe_shape(result))
+        return result
+    def _encode_model2vec(self, texts: List[str]) -> np.ndarray:
+        """Encode using model2vec."""
+        logger.info(
+            "Encoding %d texts with model2vec (model=%s, batch_size=%d)",
+            len(texts),
+            self.model_name,
+            self.batch_size,
+        )
+
+        all_embeddings = []
+
+        # Process texts in batches
+        for i in range(0, len(texts), self.batch_size):
+            batch = texts[i : i + self.batch_size]
+            batch_embeddings = self.model2vec_model.encode(batch)
+            
+            # Ensure it's a list of embeddings
+            if isinstance(batch_embeddings, np.ndarray):
+                if batch_embeddings.ndim == 1:
+                    batch_embeddings = [batch_embeddings]
+                all_embeddings.extend(batch_embeddings)
+            else:
+                all_embeddings.extend(batch_embeddings)
 
         result = np.array(all_embeddings, dtype=np.float32)
         logger.info("Embeddings shape: %s", _safe_shape(result))

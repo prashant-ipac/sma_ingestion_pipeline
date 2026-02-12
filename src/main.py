@@ -277,6 +277,11 @@ def ingest(
             kwargs["voyage_timeout"] = cfg.voyage_timeout
             kwargs["voyage_max_retries"] = cfg.voyage_max_retries
         
+        # Model2vec parameters
+        elif cfg.embedding_provider == "model2vec":
+            kwargs["model2vec_quantize"] = cfg.model2vec_quantize
+            kwargs["model2vec_enable_wasm"] = cfg.model2vec_enable_wasm
+        
         model = EmbeddingModel(**kwargs)
         embeddings = model.encode(chunks)
 

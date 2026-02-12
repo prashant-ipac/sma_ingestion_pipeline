@@ -79,6 +79,10 @@ class Config:
     )
     voyage_max_retries: int = _get_env_int("VOYAGE_MAX_RETRIES", 2)
 
+    # Model2vec-specific
+    model2vec_quantize: bool = _get_env_bool("MODEL2VEC_QUANTIZE", False)
+    model2vec_enable_wasm: bool = _get_env_bool("MODEL2VEC_ENABLE_WASM", False)
+
     # -----------------------
     # Chunking
     # -----------------------
@@ -234,6 +238,8 @@ class Config:
             "voyage_truncation": self.voyage_truncation,
             "voyage_output_dimension": self.voyage_output_dimension,
             "voyage_output_dtype": self.voyage_output_dtype,
+            "model2vec_quantize": self.model2vec_quantize,
+            "model2vec_enable_wasm": self.model2vec_enable_wasm,
             "chunking_strategy": self.chunking_strategy,
             "chunk_size": self.chunk_size,
             "chunk_overlap": self.chunk_overlap,

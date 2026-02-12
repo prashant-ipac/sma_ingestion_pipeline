@@ -12,7 +12,8 @@ python-dotenv
 typer[all]
 rich
 pymongo[srv]==3.12
-voyageai 
+voyageai
+model2vec
 numpy
 emoji>=2.8.0
 

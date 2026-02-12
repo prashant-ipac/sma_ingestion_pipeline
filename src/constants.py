@@ -15,6 +15,7 @@ SUPPORTED_CHUNKING_STRATEGIES: Final[List[str]] = [
 SUPPORTED_EMBEDDING_PROVIDERS: Final[List[str]] = [
     "sentence_transformers",
     "voyage",
+    "model2vec",
 ]
 
 # Default Excel-related constants

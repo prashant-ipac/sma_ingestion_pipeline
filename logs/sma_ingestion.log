@@ -1619,3 +1619,894 @@ TypeError: format_row_to_db_columns() got an unexpected keyword argument 'column
 2026-02-09 13:32:14,956 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
 2026-02-09 13:32:14,957 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
 2026-02-09 13:32:27,979 [INFO] src.embedding - Model loaded.
+2026-02-09 14:36:15,806 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 14:36:15,806 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 14:36:15,822 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 14:36:15,823 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 14:36:15,823 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 14:36:15,824 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 14:36:30,440 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=7.37s
+2026-02-09 14:36:30,447 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 14:36:30,499 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.05s
+2026-02-09 14:36:30,500 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 14:36:30,502 [INFO] __main__ - ✅ END: Load Excel data | 14.68s
+2026-02-09 14:36:30,503 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 14:36:30,503 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 14:36:30,512 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 14:36:30,513 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 14:36:30,514 [INFO] __main__ - ✅ END: Chunk texts | 0.01s
+2026-02-09 14:36:30,539 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 14:36:30,539 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 14:36:30,540 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 14:36:30,541 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 14:36:30,542 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 14:36:30,543 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 14:36:30,543 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 14:36:30,544 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 14:36:30,545 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 14:36:30,550 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 14:36:30,551 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 14:36:43,633 [INFO] src.embedding - Model loaded.
+2026-02-09 14:38:25,872 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 14:38:25,879 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 14:38:25,894 [INFO] __main__ - ✅ END: Create embeddings | 115.35s
+2026-02-09 14:38:25,895 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 14:38:26,053 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 14:38:26,082 [INFO] __main__ - ✅ END: Init vector store | 0.19s
+2026-02-09 14:38:26,084 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 14:38:26,085 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 14:38:26,099 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 14:38:26,890 [INFO] __main__ - ✅ END: Write embeddings to vector store | 0.80s
+2026-02-09 14:38:26,893 [INFO] __main__ - Ingestion completed successfully.
+2026-02-09 15:36:43,652 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-09 15:36:43,658 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-09 15:36:43,681 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-09 15:36:43,681 [INFO] __main__ - ▶ START: Load Excel data | sheet=sample text_columns=['Message']
+2026-02-09 15:36:43,682 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=sample expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-09 15:36:43,682 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=sample size=30.17MB
+2026-02-09 15:37:09,515 [INFO] src.data_loader - Excel read complete: rows=99 cols=7 time=11.63s
+2026-02-09 15:37:09,526 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-09 15:37:09,624 [INFO] src.data_loader - Structured load complete: rows=99 used_rows=94 blank_rows=5 texts=94 time=0.10s
+2026-02-09 15:37:09,625 [INFO] __main__ - Loaded structured rows: texts=94 payloads=94
+2026-02-09 15:37:09,628 [INFO] __main__ - ✅ END: Load Excel data | 25.95s
+2026-02-09 15:37:09,629 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-09 15:37:09,629 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-09 15:37:09,642 [INFO] src.chunking - Recursive chunking produced 98 chunks
+2026-02-09 15:37:09,643 [INFO] __main__ - Chunking output: chunks=98 (from texts=94)
+2026-02-09 15:37:09,645 [INFO] __main__ - ✅ END: Chunk texts | 0.02s
+2026-02-09 15:37:09,683 [INFO] __main__ - Cleaned chunks: cleaned=98 original=98
+2026-02-09 15:37:09,684 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=94 chunks=98
+2026-02-09 15:37:09,685 [INFO] __main__ - Payload mapping complete: 98 payloads for 98 chunks
+2026-02-09 15:37:09,685 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.00s
+2026-02-09 15:37:09,686 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-09 15:37:09,686 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-09 15:37:09,687 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-09 15:37:09,688 [INFO] src.embedding - Encoding 98 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-09 15:37:09,688 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-09 15:37:09,699 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-09 15:37:09,700 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-09 15:37:36,148 [INFO] src.embedding - Model loaded.
+2026-02-09 15:48:42,615 [INFO] src.embedding - Embeddings shape: (98, 1024)
+2026-02-09 15:48:42,634 [INFO] __main__ - Embeddings created: shape=(98, 1024) dtype=float32
+2026-02-09 15:48:42,691 [INFO] __main__ - ✅ END: Create embeddings | 693.00s
+2026-02-09 15:48:42,699 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-09 15:48:42,978 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-09 15:48:43,005 [INFO] __main__ - ✅ END: Init vector store | 0.30s
+2026-02-09 15:48:43,008 [INFO] __main__ - Writing embeddings: backend=pgvector items=98
+2026-02-09 15:48:43,009 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=98
+2026-02-09 15:48:43,096 [INFO] src.vector_store.pgvector_store - Inserting 98 embeddings into table 'social_media_posts' via pgvector
+2026-02-09 15:48:44,129 [INFO] __main__ - ✅ END: Write embeddings to vector store | 1.12s
+2026-02-09 15:48:44,133 [INFO] __main__ - Ingestion completed successfully.
+2026-02-10 15:44:07,088 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-10 15:44:07,090 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'sentence_transformers', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-10 15:44:07,108 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-10 15:44:07,109 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-10 15:44:07,109 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-10 15:44:07,110 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-10 15:44:31,375 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=14.21s
+2026-02-10 15:44:31,386 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-10 15:44:48,833 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=17.45s
+2026-02-10 15:44:48,841 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-10 15:44:48,847 [INFO] __main__ - ✅ END: Load Excel data | 41.74s
+2026-02-10 15:44:48,847 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-10 15:44:48,847 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-10 15:44:52,028 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-10 15:44:52,029 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-10 15:44:52,030 [INFO] __main__ - ✅ END: Chunk texts | 3.18s
+2026-02-10 15:45:36,189 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-10 15:45:36,205 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-10 15:45:36,668 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-10 15:45:36,669 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.46s
+2026-02-10 15:45:36,669 [INFO] __main__ - Embedding config: provider=sentence_transformers model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-10 15:45:36,669 [INFO] __main__ - ▶ START: Create embeddings | provider=sentence_transformers model=BAAI/bge-m3 batch_size=32
+2026-02-10 15:45:36,670 [INFO] src.embedding - Initialized sentence_transformers (model=BAAI/bge-m3, device=, onnx=False)
+2026-02-10 15:45:36,671 [INFO] src.embedding - Encoding 55161 texts with sentence_transformers (batch_size=32, onnx=False)
+2026-02-10 15:45:36,672 [INFO] src.embedding - Loading sentence_transformers model 'BAAI/bge-m3'...
+2026-02-10 15:45:36,684 [INFO] sentence_transformers.SentenceTransformer - Use pytorch device_name: cpu
+2026-02-10 15:45:36,685 [INFO] sentence_transformers.SentenceTransformer - Load pretrained SentenceTransformer: BAAI/bge-m3
+2026-02-10 15:47:30,123 [INFO] src.embedding - Model loaded.
+2026-02-11 18:20:45,565 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:20:45,565 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:20:45,579 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:20:45,579 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:20:45,580 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:20:45,580 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:21:14,859 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=14.45s
+2026-02-11 18:21:14,868 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:21:30,484 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=15.62s
+2026-02-11 18:21:30,492 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:21:30,498 [INFO] __main__ - ✅ END: Load Excel data | 44.92s
+2026-02-11 18:21:30,499 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:21:30,499 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:21:33,887 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:21:33,888 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:21:33,892 [INFO] __main__ - ✅ END: Chunk texts | 3.39s
+2026-02-11 18:22:16,610 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:22:16,624 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:22:16,776 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:22:16,777 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.15s
+2026-02-11 18:22:16,777 [INFO] __main__ - Embedding config: provider=model2vec model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:22:16,777 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=BAAI/bge-m3 batch_size=32
+2026-02-11 18:22:16,778 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.00s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 263, in _init_model2vec
+    from model2vec import StaticModel
+ModuleNotFoundError: No module named 'model2vec'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 285, in ingest
+    model = EmbeddingModel(**kwargs)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 200, in __init__
+    self._init_model2vec(
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 265, in _init_model2vec
+    raise ImportError("model2vec not installed. Install with: pip install model2vec")
+ImportError: model2vec not installed. Install with: pip install model2vec
+2026-02-11 18:23:04,119 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:23:04,120 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:23:04,140 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:23:04,141 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:23:04,141 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:23:04,142 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:23:35,928 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=19.01s
+2026-02-11 18:23:35,944 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:23:53,673 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=17.73s
+2026-02-11 18:23:53,682 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:23:53,684 [INFO] __main__ - ✅ END: Load Excel data | 49.54s
+2026-02-11 18:23:53,684 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:23:53,685 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:23:56,721 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:23:56,721 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:23:56,723 [INFO] __main__ - ✅ END: Chunk texts | 3.04s
+2026-02-11 18:24:49,791 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:24:49,820 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:24:49,975 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:24:49,976 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.15s
+2026-02-11 18:24:49,977 [INFO] __main__ - Embedding config: provider=model2vec model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:24:49,977 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=BAAI/bge-m3 batch_size=32
+2026-02-11 18:24:49,992 [INFO] src.embedding - Initialized model2vec (model=BAAI/bge-m3, quantize=False, enable_wasm=False)
+2026-02-11 18:24:50,011 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=BAAI/bge-m3, batch_size=32)
+2026-02-11 18:24:50,011 [INFO] src.embedding - Loading model2vec model 'BAAI/bge-m3'...
+2026-02-11 18:24:50,013 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.03s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 286, in ingest
+    embeddings = model.encode(chunks)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 314, in encode
+    return self._encode_model2vec(texts_list)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 385, in _encode_model2vec
+    batch_embeddings = self.model2vec_model.encode(batch)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 297, in model2vec_model
+    self._m2v_model = StaticModel.from_pretrained(
+TypeError: StaticModel.from_pretrained() got an unexpected keyword argument 'quantize'
+2026-02-11 18:28:23,359 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:28:23,359 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:28:23,376 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:28:23,377 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:28:23,377 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:28:23,378 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:28:45,396 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=12.91s
+2026-02-11 18:28:45,397 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:29:00,994 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=15.60s
+2026-02-11 18:29:01,002 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:29:01,007 [INFO] __main__ - ✅ END: Load Excel data | 37.63s
+2026-02-11 18:29:01,008 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:29:01,009 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:29:03,808 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:29:03,808 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:29:03,809 [INFO] __main__ - ✅ END: Chunk texts | 2.80s
+2026-02-11 18:29:36,727 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:29:36,728 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:29:36,749 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:29:36,750 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:29:36,751 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:29:36,751 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:29:57,097 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=12.74s
+2026-02-11 18:29:57,097 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:30:12,132 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=15.03s
+2026-02-11 18:30:12,140 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:30:12,142 [INFO] __main__ - ✅ END: Load Excel data | 35.39s
+2026-02-11 18:30:12,143 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:30:12,144 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:30:15,416 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:30:15,416 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:30:15,418 [INFO] __main__ - ✅ END: Chunk texts | 3.27s
+2026-02-11 18:31:02,072 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:31:02,095 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:31:02,273 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:31:02,276 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.18s
+2026-02-11 18:31:02,276 [INFO] __main__ - Embedding config: provider=model2vec model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:31:02,277 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=BAAI/bge-m3 batch_size=32
+2026-02-11 18:31:02,287 [INFO] src.embedding - Initialized model2vec (model=BAAI/bge-m3, quantize=False, enable_wasm=False)
+2026-02-11 18:31:02,304 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=BAAI/bge-m3, batch_size=32)
+2026-02-11 18:31:02,304 [INFO] src.embedding - Loading model2vec model 'BAAI/bge-m3'...
+2026-02-11 18:31:02,306 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.03s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 286, in ingest
+    embeddings = model.encode(chunks)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 314, in encode
+    return self._encode_model2vec(texts_list)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 385, in _encode_model2vec
+    batch_embeddings = self.model2vec_model.encode(batch)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 297, in model2vec_model
+    self._m2v_model = StaticModel.from_pretrained(
+TypeError: StaticModel.from_pretrained() got an unexpected keyword argument 'quantize'
+2026-02-11 18:34:00,396 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:34:00,396 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:34:00,412 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:34:00,413 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:34:00,413 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:34:00,414 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:34:34,265 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=19.04s
+2026-02-11 18:34:34,273 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:34:57,548 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=23.27s
+2026-02-11 18:34:57,556 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:34:57,558 [INFO] __main__ - ✅ END: Load Excel data | 57.14s
+2026-02-11 18:34:57,559 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:34:57,560 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:35:01,918 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:35:01,918 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:35:01,922 [INFO] __main__ - ✅ END: Chunk texts | 4.36s
+2026-02-11 18:36:03,617 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:36:03,656 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:36:03,909 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:36:03,909 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.25s
+2026-02-11 18:36:03,910 [INFO] __main__ - Embedding config: provider=model2vec model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:36:03,910 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=BAAI/bge-m3 batch_size=32
+2026-02-11 18:36:03,921 [INFO] src.embedding - Initialized model2vec (model=BAAI/bge-m3, quantize=False, enable_wasm=False)
+2026-02-11 18:36:03,944 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=BAAI/bge-m3, batch_size=32)
+2026-02-11 18:36:03,946 [INFO] src.embedding - Loading model2vec model 'BAAI/bge-m3'...
+2026-02-11 18:36:03,949 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.04s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 286, in ingest
+    embeddings = model.encode(chunks)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 316, in encode
+    return self._encode_model2vec(texts_list)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 387, in _encode_model2vec
+    batch_embeddings = self.model2vec_model.encode(batch)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 299, in model2vec_model
+    self._m2v_model = StaticModel.from_pretrained(
+TypeError: StaticModel.from_pretrained() got an unexpected keyword argument 'enable_wasm'
+2026-02-11 18:38:04,457 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:38:04,457 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:38:04,490 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:38:04,490 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:38:04,491 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:38:04,491 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:38:35,191 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=19.44s
+2026-02-11 18:38:35,192 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:39:04,599 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=29.41s
+2026-02-11 18:39:04,612 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:39:04,614 [INFO] __main__ - ✅ END: Load Excel data | 60.12s
+2026-02-11 18:39:04,614 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:39:04,615 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:39:08,497 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:39:08,498 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:39:08,500 [INFO] __main__ - ✅ END: Chunk texts | 3.89s
+2026-02-11 18:40:04,745 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:40:04,820 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:40:05,105 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:40:05,105 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.28s
+2026-02-11 18:40:05,106 [INFO] __main__ - Embedding config: provider=model2vec model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:40:05,106 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=BAAI/bge-m3 batch_size=32
+2026-02-11 18:40:05,121 [INFO] src.embedding - Initialized model2vec (model=BAAI/bge-m3, quantize=False, enable_wasm=False)
+2026-02-11 18:40:05,159 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=BAAI/bge-m3, batch_size=32)
+2026-02-11 18:40:05,161 [INFO] src.embedding - Loading model2vec model 'BAAI/bge-m3'...
+2026-02-11 18:40:05,188 [INFO] model2vec.hf_utils - No cached model found for BAAI/bge-m3, loading from local or hub.
+2026-02-11 18:40:05,189 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-11 18:40:05,783 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-11 18:40:05,798 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.69s
+Traceback (most recent call last):
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 657, in hf_raise_for_status
+    response.raise_for_status()
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '404 Not Found' for url 'https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 286, in ingest
+    embeddings = model.encode(chunks)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 316, in encode
+    return self._encode_model2vec(texts_list)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 387, in _encode_model2vec
+    batch_embeddings = self.model2vec_model.encode(batch)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 299, in model2vec_model
+    self._m2v_model = StaticModel.from_pretrained(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/model2vec/model.py", line 209, in from_pretrained
+    return _loading_helper(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/model2vec/model.py", line 559, in _loading_helper
+    embeddings, tokenizer, config, metadata, weights, mapping = load_pretrained(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/model2vec/hf_utils.py", line 176, in load_pretrained
+    huggingface_hub.hf_hub_download(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1024, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1099, in _hf_hub_download_to_cache_dir
+    (url_to_download, etag, commit_hash, expected_size, xet_file_data, head_call_error) = _get_metadata_or_catch_error(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1691, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1614, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 309, in _httpx_follow_relative_redirects
+    hf_raise_for_status(response)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 671, in hf_raise_for_status
+    raise _format(RemoteEntryNotFoundError, message, response) from e
+huggingface_hub.errors.RemoteEntryNotFoundError: 404 Client Error. (Request ID: Root=1-698c7fad-0dfd8c3e0a4b538f486337a4;aeb98acd-7fbe-446e-8ffe-aedadc63da76)
+
+Entry Not Found for url: https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors.
+2026-02-11 18:48:50,554 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:48:50,555 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'BAAI/bge-m3', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:48:50,584 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=BAAI/bge-m3
+2026-02-11 18:48:50,585 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:48:50,585 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=BAAI/bge-m3
+2026-02-11 18:48:50,586 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:49:22,536 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=18.79s
+2026-02-11 18:49:22,537 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:49:47,873 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=25.34s
+2026-02-11 18:49:47,889 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:49:47,893 [INFO] __main__ - ✅ END: Load Excel data | 57.31s
+2026-02-11 18:49:47,893 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:49:47,894 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:49:52,615 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:49:52,616 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:49:52,618 [INFO] __main__ - ✅ END: Chunk texts | 4.72s
+2026-02-11 18:50:56,230 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:50:56,264 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:50:56,434 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:50:56,434 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.17s
+2026-02-11 18:50:56,435 [INFO] __main__ - Embedding config: provider=model2vec model=BAAI/bge-m3 batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:50:56,435 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=BAAI/bge-m3 batch_size=32
+2026-02-11 18:50:56,443 [INFO] src.embedding - Initialized model2vec (model=BAAI/bge-m3, quantize=False, enable_wasm=False)
+2026-02-11 18:50:56,469 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=BAAI/bge-m3, batch_size=32)
+2026-02-11 18:50:56,472 [INFO] src.embedding - Loading model2vec model 'BAAI/bge-m3'...
+2026-02-11 18:50:56,486 [INFO] model2vec.hf_utils - No cached model found for BAAI/bge-m3, loading from local or hub.
+2026-02-11 18:50:56,486 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-11 18:50:56,944 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+2026-02-11 18:50:56,948 [ERROR] __main__ - ❌ FAIL: Create embeddings | 0.51s
+Traceback (most recent call last):
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 657, in hf_raise_for_status
+    response.raise_for_status()
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/httpx/_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '404 Not Found' for url 'https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 286, in ingest
+    embeddings = model.encode(chunks)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 316, in encode
+    return self._encode_model2vec(texts_list)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 387, in _encode_model2vec
+    batch_embeddings = self.model2vec_model.encode(batch)
+  File "/home/prashant/sma_ingestion_pipeline/src/embedding.py", line 299, in model2vec_model
+    self._m2v_model = StaticModel.from_pretrained(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/model2vec/model.py", line 209, in from_pretrained
+    return _loading_helper(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/model2vec/model.py", line 559, in _loading_helper
+    embeddings, tokenizer, config, metadata, weights, mapping = load_pretrained(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/model2vec/hf_utils.py", line 176, in load_pretrained
+    huggingface_hub.hf_hub_download(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1024, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1099, in _hf_hub_download_to_cache_dir
+    (url_to_download, etag, commit_hash, expected_size, xet_file_data, head_call_error) = _get_metadata_or_catch_error(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1691, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1614, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects(
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 309, in _httpx_follow_relative_redirects
+    hf_raise_for_status(response)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 671, in hf_raise_for_status
+    raise _format(RemoteEntryNotFoundError, message, response) from e
+huggingface_hub.errors.RemoteEntryNotFoundError: 404 Client Error. (Request ID: Root=1-698c8239-5c20a75312343cc9635d8c44;e706638a-5216-4266-b903-bb1151ac167f)
+
+Entry Not Found for url: https://huggingface.co/BAAI/bge-m3/resolve/main/model.safetensors.
+2026-02-11 18:53:49,571 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-11 18:53:49,571 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-11 18:53:49,592 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-11 18:53:49,592 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-11 18:53:49,593 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-11 18:53:49,594 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-11 18:54:20,152 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=18.93s
+2026-02-11 18:54:20,153 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-11 18:54:43,983 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=23.83s
+2026-02-11 18:54:43,990 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-11 18:54:43,995 [INFO] __main__ - ✅ END: Load Excel data | 54.40s
+2026-02-11 18:54:43,998 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-11 18:54:44,001 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-11 18:54:48,774 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-11 18:54:48,775 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-11 18:54:48,777 [INFO] __main__ - ✅ END: Chunk texts | 4.78s
+2026-02-11 18:55:52,974 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-11 18:55:52,999 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-11 18:55:53,169 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-11 18:55:53,170 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.17s
+2026-02-11 18:55:53,170 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-11 18:55:53,171 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-11 18:55:53,178 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-11 18:55:53,193 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-11 18:55:53,194 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-11 18:55:53,201 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-11 18:55:53,202 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-11 18:55:53,554 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-11 18:55:53,902 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/models/johnpaulbin/bge-m3-distilled/xet-read-token/eca5c6e74922f1e24ed3868c34c66c9215a71cb0 "HTTP/1.1 200 OK"
+2026-02-11 18:56:10,086 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-11 18:56:10,333 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-11 18:56:10,594 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-11 18:56:10,861 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-11 18:56:11,092 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-11 18:56:11,420 [INFO] httpx - HTTP Request: GET https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-11 18:56:11,664 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-11 18:56:23,936 [INFO] src.embedding - Model loaded.
+2026-02-11 18:56:47,386 [INFO] src.embedding - Embeddings shape: (55161, 256)
+2026-02-11 18:56:47,400 [INFO] __main__ - Embeddings created: shape=(55161, 256) dtype=float32
+2026-02-11 18:56:47,406 [INFO] __main__ - ✅ END: Create embeddings | 54.24s
+2026-02-11 18:56:47,430 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-11 18:56:47,594 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-11 18:56:47,634 [INFO] __main__ - ✅ END: Init vector store | 0.20s
+2026-02-11 18:56:47,636 [INFO] __main__ - Writing embeddings: backend=pgvector items=55161
+2026-02-11 18:56:47,637 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=55161
+2026-02-11 18:56:48,955 [INFO] src.vector_store.pgvector_store - Inserting 55161 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 10:38:38,711 [ERROR] __main__ - ❌ FAIL: Write embeddings to vector store | 56511.07s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 350, in ingest
+    store.add_embeddings(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 189, in add_embeddings
+    execute_values(cur, query, records)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/psycopg2/extras.py", line 1299, in execute_values
+    cur.execute(b''.join(parts))
+psycopg2.errors.DataException: expected 1024 dimensions, not 256
+
+2026-02-12 12:12:00,875 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 12:12:00,877 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 12:12:00,895 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 12:12:00,896 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-12 12:12:00,896 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 12:12:00,897 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-12 12:12:22,376 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=12.25s
+2026-02-12 12:12:22,381 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 12:12:36,321 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=13.94s
+2026-02-12 12:12:36,329 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-12 12:12:36,336 [INFO] __main__ - ✅ END: Load Excel data | 35.44s
+2026-02-12 12:12:36,337 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 12:12:36,340 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 12:12:39,051 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-12 12:12:39,052 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-12 12:12:39,053 [INFO] __main__ - ✅ END: Chunk texts | 2.71s
+2026-02-12 12:13:18,087 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-12 12:13:18,119 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-12 12:13:18,396 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-12 12:13:18,397 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.28s
+2026-02-12 12:13:18,397 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 12:13:18,397 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 12:13:18,415 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 12:13:18,424 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 12:13:18,425 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 12:13:18,489 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 12:13:18,489 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 12:37:41,414 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 12:37:41,417 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 12:37:41,435 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 12:37:41,436 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['Message']
+2026-02-12 12:37:41,436 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 12:37:41,437 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=30.17MB
+2026-02-12 12:38:10,762 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=14.03s
+2026-02-12 12:38:10,763 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 12:38:22,601 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=11.84s
+2026-02-12 12:38:22,605 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-12 12:38:22,607 [INFO] __main__ - ✅ END: Load Excel data | 41.17s
+2026-02-12 12:38:22,608 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 12:38:22,609 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 12:38:23,596 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-12 12:38:23,597 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-12 12:38:23,601 [INFO] __main__ - ✅ END: Chunk texts | 0.99s
+2026-02-12 12:38:43,660 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-12 12:38:43,691 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-12 12:38:43,818 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-12 12:38:43,819 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.13s
+2026-02-12 12:38:43,819 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 12:38:43,821 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 12:38:43,832 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 12:38:43,843 [INFO] src.embedding - Encoding 23941 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 12:38:43,845 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 12:38:43,854 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 12:38:43,856 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:11:26,145 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:11:26,146 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:11:26,153 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:11:26,153 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['Message']
+2026-02-12 14:11:26,154 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:11:26,154 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=30.17MB
+2026-02-12 14:11:39,310 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=8.30s
+2026-02-12 14:11:39,316 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:11:44,859 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=5.54s
+2026-02-12 14:11:44,866 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-12 14:11:44,868 [INFO] __main__ - ✅ END: Load Excel data | 18.71s
+2026-02-12 14:11:44,868 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:11:44,869 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:11:46,397 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-12 14:11:46,398 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-12 14:11:46,399 [INFO] __main__ - ✅ END: Chunk texts | 1.53s
+2026-02-12 14:11:56,260 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-12 14:11:56,264 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-12 14:11:56,300 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-12 14:11:56,300 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.04s
+2026-02-12 14:11:56,301 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:11:56,301 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:11:56,314 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:11:56,315 [INFO] src.embedding - Encoding 23941 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:11:56,315 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:11:56,321 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:11:56,322 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:11:56,942 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:11:57,379 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:11:57,419 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:11:57,692 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:11:57,723 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:11:57,988 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:12:01,002 [INFO] src.embedding - Model loaded.
+2026-02-12 14:12:06,097 [INFO] src.embedding - Embeddings shape: (23941, 256)
+2026-02-12 14:12:06,102 [INFO] __main__ - Embeddings created: shape=(23941, 256) dtype=float32
+2026-02-12 14:12:06,104 [INFO] __main__ - ✅ END: Create embeddings | 9.80s
+2026-02-12 14:12:06,108 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:12:06,216 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:12:06,238 [INFO] __main__ - ✅ END: Init vector store | 0.13s
+2026-02-12 14:12:06,239 [INFO] __main__ - Writing embeddings: backend=pgvector items=23941
+2026-02-12 14:12:06,240 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=23941
+2026-02-12 14:12:06,421 [INFO] src.vector_store.pgvector_store - Inserting 23941 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:12:06,456 [ERROR] __main__ - ❌ FAIL: Write embeddings to vector store | 0.22s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 350, in ingest
+    store.add_embeddings(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 146, in add_embeddings
+    engagement_total = int(engagement_total) if engagement_total is not None else None
+ValueError: invalid literal for int() with base 10: '3402.0'
+2026-02-12 14:21:51,539 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:21:51,543 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:21:51,552 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:21:51,553 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['Message']
+2026-02-12 14:21:51,553 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:21:51,553 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=30.17MB
+2026-02-12 14:22:00,452 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=4.81s
+2026-02-12 14:22:00,466 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:22:04,288 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=3.82s
+2026-02-12 14:22:04,291 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-12 14:22:04,292 [INFO] __main__ - ✅ END: Load Excel data | 12.74s
+2026-02-12 14:22:04,292 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:22:04,293 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:22:04,653 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-12 14:22:04,653 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-12 14:22:04,654 [INFO] __main__ - ✅ END: Chunk texts | 0.36s
+2026-02-12 14:22:11,300 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-12 14:22:11,304 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-12 14:22:11,334 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-12 14:22:11,334 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.03s
+2026-02-12 14:22:11,334 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:22:11,334 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:22:11,356 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:22:11,357 [INFO] src.embedding - Encoding 23941 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:22:11,357 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:22:11,374 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:22:11,374 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:22:11,736 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:22:11,972 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:22:11,985 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:22:12,231 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:22:12,247 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:22:12,476 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:22:16,364 [INFO] src.embedding - Model loaded.
+2026-02-12 14:22:19,386 [INFO] src.embedding - Embeddings shape: (23941, 256)
+2026-02-12 14:22:19,389 [INFO] __main__ - Embeddings created: shape=(23941, 256) dtype=float32
+2026-02-12 14:22:19,396 [INFO] __main__ - ✅ END: Create embeddings | 8.06s
+2026-02-12 14:22:19,406 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:22:19,564 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:22:19,588 [INFO] __main__ - ✅ END: Init vector store | 0.18s
+2026-02-12 14:22:19,589 [INFO] __main__ - Writing embeddings: backend=pgvector items=23941
+2026-02-12 14:22:19,589 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=23941
+2026-02-12 14:22:19,707 [INFO] src.vector_store.pgvector_store - Inserting 23941 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:22:19,770 [ERROR] __main__ - ❌ FAIL: Write embeddings to vector store | 0.18s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 350, in ingest
+    store.add_embeddings(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 146, in add_embeddings
+    engagement_total = int(float(engagement_total)) if engagement_total is not None else None
+ValueError: could not convert string to float: ''
+2026-02-12 14:26:36,242 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:26:36,242 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:26:36,250 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:26:36,251 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['Message']
+2026-02-12 14:26:36,251 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:26:36,251 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=30.17MB
+2026-02-12 14:26:46,379 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=5.78s
+2026-02-12 14:26:46,380 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:26:50,310 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=3.93s
+2026-02-12 14:26:50,313 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-12 14:26:50,315 [INFO] __main__ - ✅ END: Load Excel data | 14.06s
+2026-02-12 14:26:50,316 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:26:50,317 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:26:50,680 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-12 14:26:50,680 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-12 14:26:50,681 [INFO] __main__ - ✅ END: Chunk texts | 0.36s
+2026-02-12 14:26:57,145 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-12 14:26:57,149 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-12 14:26:57,181 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-12 14:26:57,181 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.03s
+2026-02-12 14:26:57,181 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:26:57,181 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:26:57,184 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:26:57,186 [INFO] src.embedding - Encoding 23941 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:26:57,187 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:26:57,192 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:26:57,193 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:26:57,509 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:26:57,738 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:26:57,753 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:26:57,978 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:26:57,979 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-12 14:26:57,988 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:26:58,229 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:27:00,559 [INFO] src.embedding - Model loaded.
+2026-02-12 14:27:03,082 [INFO] src.embedding - Embeddings shape: (23941, 256)
+2026-02-12 14:27:03,084 [INFO] __main__ - Embeddings created: shape=(23941, 256) dtype=float32
+2026-02-12 14:27:03,086 [INFO] __main__ - ✅ END: Create embeddings | 5.90s
+2026-02-12 14:27:03,092 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:27:03,203 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:27:03,208 [INFO] __main__ - ✅ END: Init vector store | 0.12s
+2026-02-12 14:27:03,210 [INFO] __main__ - Writing embeddings: backend=pgvector items=23941
+2026-02-12 14:27:03,210 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=23941
+2026-02-12 14:27:03,316 [INFO] src.vector_store.pgvector_store - Inserting 23941 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:27:04,475 [ERROR] __main__ - ❌ FAIL: Write embeddings to vector store | 1.26s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 350, in ingest
+    store.add_embeddings(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 197, in add_embeddings
+    execute_values(cur, query, records)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/psycopg2/extras.py", line 1299, in execute_values
+    cur.execute(b''.join(parts))
+psycopg2.errors.DataException: expected 1024 dimensions, not 256
+
+2026-02-12 14:48:55,141 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:48:55,141 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:48:55,153 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:48:55,153 [INFO] __main__ - ▶ START: Load Excel data | sheet=Instagram text_columns=['Message']
+2026-02-12 14:48:55,154 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Instagram expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:48:55,154 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Instagram size=30.17MB
+2026-02-12 14:49:07,444 [INFO] src.data_loader - Excel read complete: rows=20070 cols=7 time=6.80s
+2026-02-12 14:49:07,445 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:49:13,104 [INFO] src.data_loader - Structured load complete: rows=20070 used_rows=19656 blank_rows=414 texts=19656 time=5.66s
+2026-02-12 14:49:13,108 [INFO] __main__ - Loaded structured rows: texts=19656 payloads=19656
+2026-02-12 14:49:13,110 [INFO] __main__ - ✅ END: Load Excel data | 17.96s
+2026-02-12 14:49:13,111 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:49:13,111 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:49:13,637 [INFO] src.chunking - Recursive chunking produced 23941 chunks
+2026-02-12 14:49:13,637 [INFO] __main__ - Chunking output: chunks=23941 (from texts=19656)
+2026-02-12 14:49:13,639 [INFO] __main__ - ✅ END: Chunk texts | 0.53s
+2026-02-12 14:49:22,845 [INFO] __main__ - Cleaned chunks: cleaned=23941 original=23941
+2026-02-12 14:49:22,850 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=19656 chunks=23941
+2026-02-12 14:49:22,895 [INFO] __main__ - Payload mapping complete: 23941 payloads for 23941 chunks
+2026-02-12 14:49:22,895 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.04s
+2026-02-12 14:49:22,896 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:49:22,896 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:49:22,914 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:49:22,915 [INFO] src.embedding - Encoding 23941 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:49:22,916 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:49:22,926 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:49:22,927 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:49:23,366 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:49:23,369 [WARNING] huggingface_hub.utils._http - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-02-12 14:49:23,677 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:49:23,689 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:49:23,980 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:49:23,996 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:49:24,290 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:49:28,052 [INFO] src.embedding - Model loaded.
+2026-02-12 14:49:33,800 [INFO] src.embedding - Embeddings shape: (23941, 256)
+2026-02-12 14:49:33,805 [INFO] __main__ - Embeddings created: shape=(23941, 256) dtype=float32
+2026-02-12 14:49:33,810 [INFO] __main__ - ✅ END: Create embeddings | 10.91s
+2026-02-12 14:49:33,819 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:49:33,861 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:49:33,864 [INFO] __main__ - ✅ END: Init vector store | 0.04s
+2026-02-12 14:49:33,866 [INFO] __main__ - Writing embeddings: backend=pgvector items=23941
+2026-02-12 14:49:33,866 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=23941
+2026-02-12 14:49:34,046 [INFO] src.vector_store.pgvector_store - Inserting 23941 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:50:02,402 [INFO] __main__ - ✅ END: Write embeddings to vector store | 28.54s
+2026-02-12 14:50:02,404 [INFO] __main__ - Ingestion completed successfully.
+2026-02-12 14:50:40,891 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:50:40,892 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:50:40,905 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:50:40,905 [INFO] __main__ - ▶ START: Load Excel data | sheet=Facebook text_columns=['Message']
+2026-02-12 14:50:40,906 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Facebook expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:50:40,906 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Facebook size=30.17MB
+2026-02-12 14:50:54,853 [INFO] src.data_loader - Excel read complete: rows=36590 cols=7 time=8.49s
+2026-02-12 14:50:54,854 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:51:05,109 [INFO] src.data_loader - Structured load complete: rows=36590 used_rows=33753 blank_rows=2837 texts=33753 time=10.25s
+2026-02-12 14:51:05,115 [INFO] __main__ - Loaded structured rows: texts=33753 payloads=33753
+2026-02-12 14:51:05,118 [INFO] __main__ - ✅ END: Load Excel data | 24.21s
+2026-02-12 14:51:05,119 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:51:05,119 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:51:07,064 [INFO] src.chunking - Recursive chunking produced 55161 chunks
+2026-02-12 14:51:07,064 [INFO] __main__ - Chunking output: chunks=55161 (from texts=33753)
+2026-02-12 14:51:07,066 [INFO] __main__ - ✅ END: Chunk texts | 1.95s
+2026-02-12 14:51:32,305 [INFO] __main__ - Cleaned chunks: cleaned=55161 original=55161
+2026-02-12 14:51:32,315 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=33753 chunks=55161
+2026-02-12 14:51:32,395 [INFO] __main__ - Payload mapping complete: 55161 payloads for 55161 chunks
+2026-02-12 14:51:32,396 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.08s
+2026-02-12 14:51:32,396 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:51:32,397 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:51:32,403 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:51:32,406 [INFO] src.embedding - Encoding 55161 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:51:32,407 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:51:32,413 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:51:32,414 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:51:32,901 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:51:33,207 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:51:33,251 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:51:33,516 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:51:33,534 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:51:33,824 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:51:36,634 [INFO] src.embedding - Model loaded.
+2026-02-12 14:51:50,829 [INFO] src.embedding - Embeddings shape: (55161, 256)
+2026-02-12 14:51:50,841 [INFO] __main__ - Embeddings created: shape=(55161, 256) dtype=float32
+2026-02-12 14:51:50,844 [INFO] __main__ - ✅ END: Create embeddings | 18.45s
+2026-02-12 14:51:50,859 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:51:50,903 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:51:50,911 [INFO] __main__ - ✅ END: Init vector store | 0.05s
+2026-02-12 14:51:50,914 [INFO] __main__ - Writing embeddings: backend=pgvector items=55161
+2026-02-12 14:51:50,914 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=55161
+2026-02-12 14:51:51,250 [INFO] src.vector_store.pgvector_store - Inserting 55161 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:52:57,102 [INFO] __main__ - ✅ END: Write embeddings to vector store | 66.19s
+2026-02-12 14:52:57,106 [INFO] __main__ - Ingestion completed successfully.
+2026-02-12 14:53:27,604 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:53:27,605 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:53:27,618 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Twitter backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:53:27,620 [INFO] __main__ - ▶ START: Load Excel data | sheet=Twitter text_columns=['Message']
+2026-02-12 14:53:27,620 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Twitter expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:53:27,621 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Twitter size=30.17MB
+2026-02-12 14:53:41,228 [INFO] src.data_loader - Excel read complete: rows=37438 cols=7 time=8.08s
+2026-02-12 14:53:41,229 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:53:51,654 [INFO] src.data_loader - Structured load complete: rows=37438 used_rows=37438 blank_rows=0 texts=37438 time=10.42s
+2026-02-12 14:53:51,662 [INFO] __main__ - Loaded structured rows: texts=37438 payloads=37438
+2026-02-12 14:53:51,664 [INFO] __main__ - ✅ END: Load Excel data | 24.04s
+2026-02-12 14:53:51,665 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:53:51,666 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:53:52,494 [INFO] src.chunking - Recursive chunking produced 37438 chunks
+2026-02-12 14:53:52,496 [INFO] __main__ - Chunking output: chunks=37438 (from texts=37438)
+2026-02-12 14:53:52,498 [INFO] __main__ - ✅ END: Chunk texts | 0.83s
+2026-02-12 14:54:05,254 [INFO] __main__ - Cleaned chunks: cleaned=37438 original=37438
+2026-02-12 14:54:05,261 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=37438 chunks=37438
+2026-02-12 14:54:05,321 [INFO] __main__ - Payload mapping complete: 37438 payloads for 37438 chunks
+2026-02-12 14:54:05,321 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.06s
+2026-02-12 14:54:05,321 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:54:05,322 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:54:05,325 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:54:05,328 [INFO] src.embedding - Encoding 37438 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:54:05,329 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:54:05,334 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:54:05,335 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:54:05,684 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:54:05,986 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:54:06,002 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:54:06,294 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:54:06,314 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:54:06,599 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:54:10,132 [INFO] src.embedding - Model loaded.
+2026-02-12 14:54:17,765 [INFO] src.embedding - Embeddings shape: (37438, 256)
+2026-02-12 14:54:17,771 [INFO] __main__ - Embeddings created: shape=(37438, 256) dtype=float32
+2026-02-12 14:54:17,774 [INFO] __main__ - ✅ END: Create embeddings | 12.45s
+2026-02-12 14:54:17,782 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:54:17,840 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:54:17,868 [INFO] __main__ - ✅ END: Init vector store | 0.09s
+2026-02-12 14:54:17,871 [INFO] __main__ - Writing embeddings: backend=pgvector items=37438
+2026-02-12 14:54:17,872 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=37438
+2026-02-12 14:54:18,132 [INFO] src.vector_store.pgvector_store - Inserting 37438 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:55:02,669 [INFO] __main__ - ✅ END: Write embeddings to vector store | 44.80s
+2026-02-12 14:55:02,671 [INFO] __main__ - Ingestion completed successfully.
+2026-02-12 14:55:34,195 [INFO] root - Logging initialized: level=INFO log_file=logs/sma_ingestion.log
+2026-02-12 14:55:34,195 [INFO] __main__ - Resolved config summary: {'embedding_provider': 'model2vec', 'embedding_model': 'johnpaulbin/bge-m3-distilled', 'embedding_dim': 1024, 'embedding_batch_size': 32, 'embedding_device': '', 'embedding_use_onnx': False, 'voyage_input_type': 'document', 'voyage_truncation': True, 'voyage_output_dimension': 1024, 'voyage_output_dtype': 'float', 'model2vec_quantize': False, 'model2vec_enable_wasm': False, 'chunking_strategy': 'recursive', 'chunk_size': 512, 'chunk_overlap': 50, 'backend': 'pgvector', 'atlasdb_database_name': 'sma-ipac', 'atlasdb_collection_name': 'instagram', 'atlasdb_uri_set': True, 'aws_s3_bucket_name_set': False, 'chromadb_path': './chromadb_store', 'pgvector_table_name': 'social_media_posts', 'milvus_collection_name': 'social_media_embeddings', 'log_level': 'INFO', 'default_sheet_name': 'Sheet1', 'text_columns': ['Message'], 'normalization': {'lower': True, 'unicode_nfkc': True, 'collapse_ws': True, 'strip_emails': True, 'strip_urls': True, 'strip_hashtags': False, 'strip_mentions': True, 'strip_html_like': True, 'drop_digits': False, 'emoji_policy': 'demojize'}}
+2026-02-12 14:55:34,209 [INFO] __main__ - Run parameters: excel_path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Youtube backend=pgvector chunking=recursive model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:55:34,210 [INFO] __main__ - ▶ START: Load Excel data | sheet=Youtube text_columns=['Message']
+2026-02-12 14:55:34,210 [INFO] src.data_loader - load_structured_data_from_excel(): sheet=Youtube expected_columns=['Message'] embedding_model=johnpaulbin/bge-m3-distilled
+2026-02-12 14:55:34,211 [INFO] src.data_loader - Reading Excel: path=src/data/Vector_DB_platform_wise_data_23March_13Dec_2025.xlsx sheet=Youtube size=30.17MB
+2026-02-12 14:55:44,964 [INFO] src.data_loader - Excel read complete: rows=6681 cols=5 time=5.43s
+2026-02-12 14:55:44,965 [INFO] src.data_loader - Using text columns: ['Message']
+2026-02-12 14:55:46,548 [INFO] src.data_loader - Structured load complete: rows=6681 used_rows=5406 blank_rows=1275 texts=5406 time=1.58s
+2026-02-12 14:55:46,549 [INFO] __main__ - Loaded structured rows: texts=5406 payloads=5406
+2026-02-12 14:55:46,551 [INFO] __main__ - ✅ END: Load Excel data | 12.34s
+2026-02-12 14:55:46,552 [INFO] __main__ - ▶ START: Chunk texts | strategy=recursive chunk_size=512 overlap=50
+2026-02-12 14:55:46,553 [INFO] src.chunking - Chunking texts with strategy=recursive, chunk_size=512, overlap=50
+2026-02-12 14:55:46,784 [INFO] src.chunking - Recursive chunking produced 12885 chunks
+2026-02-12 14:55:46,784 [INFO] __main__ - Chunking output: chunks=12885 (from texts=5406)
+2026-02-12 14:55:46,786 [INFO] __main__ - ✅ END: Chunk texts | 0.23s
+2026-02-12 14:55:51,944 [INFO] __main__ - Cleaned chunks: cleaned=12885 original=12885
+2026-02-12 14:55:51,948 [INFO] __main__ - ▶ START: Map payloads to chunks | payloads=5406 chunks=12885
+2026-02-12 14:55:51,973 [INFO] __main__ - Payload mapping complete: 12885 payloads for 12885 chunks
+2026-02-12 14:55:51,973 [INFO] __main__ - ✅ END: Map payloads to chunks | 0.02s
+2026-02-12 14:55:51,974 [INFO] __main__ - Embedding config: provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32 device= onnx=False input_type=document out_dim=1024 dtype=float
+2026-02-12 14:55:51,974 [INFO] __main__ - ▶ START: Create embeddings | provider=model2vec model=johnpaulbin/bge-m3-distilled batch_size=32
+2026-02-12 14:55:51,984 [INFO] src.embedding - Initialized model2vec (model=johnpaulbin/bge-m3-distilled, quantize=False, enable_wasm=False)
+2026-02-12 14:55:51,985 [INFO] src.embedding - Encoding 12885 texts with model2vec (model=johnpaulbin/bge-m3-distilled, batch_size=32)
+2026-02-12 14:55:51,987 [INFO] src.embedding - Loading model2vec model 'johnpaulbin/bge-m3-distilled'...
+2026-02-12 14:55:51,989 [INFO] model2vec.hf_utils - No cached model found for johnpaulbin/bge-m3-distilled, loading from local or hub.
+2026-02-12 14:55:51,989 [INFO] model2vec.hf_utils - Folder does not exist locally, attempting to use huggingface hub.
+2026-02-12 14:55:52,385 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/model.safetensors "HTTP/1.1 302 Found"
+2026-02-12 14:55:52,620 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:55:52,635 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/README.md "HTTP/1.1 200 OK"
+2026-02-12 14:55:52,894 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-02-12 14:55:52,908 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/johnpaulbin/bge-m3-distilled/eca5c6e74922f1e24ed3868c34c66c9215a71cb0/config.json "HTTP/1.1 200 OK"
+2026-02-12 14:55:53,202 [INFO] httpx - HTTP Request: HEAD https://huggingface.co/johnpaulbin/bge-m3-distilled/resolve/main/tokenizer.json "HTTP/1.1 302 Found"
+2026-02-12 14:55:55,980 [INFO] src.embedding - Model loaded.
+2026-02-12 14:55:58,565 [INFO] src.embedding - Embeddings shape: (12885, 256)
+2026-02-12 14:55:58,568 [INFO] __main__ - Embeddings created: shape=(12885, 256) dtype=float32
+2026-02-12 14:55:58,570 [INFO] __main__ - ✅ END: Create embeddings | 6.60s
+2026-02-12 14:55:58,575 [INFO] __main__ - ▶ START: Init vector store | backend=pgvector
+2026-02-12 14:55:58,612 [INFO] src.vector_store.pgvector_store - Ensuring pgvector extension and table 'social_media_posts' exist
+2026-02-12 14:55:58,615 [INFO] __main__ - ✅ END: Init vector store | 0.04s
+2026-02-12 14:55:58,618 [INFO] __main__ - Writing embeddings: backend=pgvector items=12885
+2026-02-12 14:55:58,618 [INFO] __main__ - ▶ START: Write embeddings to vector store | backend=pgvector items=12885
+2026-02-12 14:55:58,750 [INFO] src.vector_store.pgvector_store - Inserting 12885 embeddings into table 'social_media_posts' via pgvector
+2026-02-12 14:55:59,651 [ERROR] __main__ - ❌ FAIL: Write embeddings to vector store | 1.03s
+Traceback (most recent call last):
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 45, in log_step
+    yield
+  File "/home/prashant/sma_ingestion_pipeline/src/main.py", line 350, in ingest
+    store.add_embeddings(
+  File "/home/prashant/sma_ingestion_pipeline/src/vector_store/pgvector_store.py", line 197, in add_embeddings
+    execute_values(cur, query, records)
+  File "/home/prashant/anaconda3/envs/vectordb/lib/python3.10/site-packages/psycopg2/extras.py", line 1299, in execute_values
+    cur.execute(b''.join(parts))
+psycopg2.errors.InvalidDatetimeFormat: invalid input syntax for type date: "45739"
+LINE 7: ...-be93-8c60160f4d00','Youtube','None','Tamil Nadu','45739','a...
+                                                             ^
+
